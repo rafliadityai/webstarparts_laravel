@@ -1,0 +1,24 @@
+Starparts Motor — Phase 22 / Phase 6: WhatsApp Order Journey
+
+Base package: complete website from Phase 5.
+
+New files:
+- includes/whatsapp_order.php
+- tools/test_whatsapp_order.php
+- README_WHATSAPP_AI_PHASE22_PHASE6.md
+- README_PEMBARUAN_PHASE22_ORDER_JOURNEY.md
+- MANIFEST_PHASE22.txt
+
+Updated files:
+- api/whatsapp/webhook.php
+- api/whatsapp/health.php
+
+Behavior:
+- Detect order and product-link intent deterministically.
+- Number product links so customers can choose by number.
+- Resolve ordinal/number choice against links in the immediately previous assistant reply.
+- Re-check selected slug against active products before sending the link.
+- Do not claim that a WhatsApp message created an order or payment.
+
+No new SQL migration. `config.local.php` and production secrets are not packaged.
+Live Fonnte/web hosting tests were not run; local PHP lint and offline tests are documented in README_WHATSAPP_AI_PHASE22_PHASE6.md.

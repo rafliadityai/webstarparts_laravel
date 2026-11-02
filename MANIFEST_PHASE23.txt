@@ -1,0 +1,26 @@
+Starparts Motor — Phase 23 / Phase 7: Fonnte Payload & Reliability
+
+Base package: complete website from Phase 6.
+
+New files:
+- includes/fonnte_payload.php
+- tools/test_fonnte_payload.php
+- tools/TEST_END_TO_END_PHASE23.md
+- README_WHATSAPP_AI_PHASE23_PHASE7.md
+- README_PEMBARUAN_PHASE23_FONNTE_PAYLOAD.md
+- MANIFEST_PHASE23.txt
+
+Updated files:
+- api/whatsapp/webhook.php
+- api/whatsapp/health.php
+
+Behavior:
+- Normalize Fonnte webhook payload fields.
+- Fall back to interactive text when message is empty.
+- Validate senders and positive inbox IDs.
+- Use inbox ID/message ID/timestamp to build event deduplication seeds, with a 120-second fallback only if metadata is unavailable.
+- Handle media/location/poll without captions safely; no remote attachment fetching.
+- Extend protected health check for payload helper availability.
+
+No SQL migration. Production secrets/config.local.php are not packaged.
+Live tests against Fonnte/hosting/WhatsApp were not run. Offline tests and PHP lint are documented in README_WHATSAPP_AI_PHASE23_PHASE7.md.

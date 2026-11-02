@@ -1,0 +1,18 @@
+Starparts Motor — Phase 21 / Phase 5
+
+Base package: complete website from Phase 4.
+New files:
+- includes/whatsapp_fitment.php
+- includes/whatsapp_reply.php
+- tools/test_whatsapp_fitment.php
+- tools/test_whatsapp_output.php
+- README_WHATSAPP_AI_PHASE21_PHASE5.md
+- README_PEMBARUAN_PHASE21_WHATSAPP_CONVERSATION.md
+- MANIFEST_PHASE21.txt
+
+Updated files:
+- api/whatsapp/webhook.php
+- api/whatsapp/catalog.php
+
+No SQL migration was added. Existing Phase 2 webhook tables are still required.
+Secrets/config.local.php are not packaged. Confirm the correct configured domain before production use.

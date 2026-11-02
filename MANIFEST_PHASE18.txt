@@ -1,0 +1,16 @@
+Starparts Motor website bundle - Phase 18 / WhatsApp AI Phase 2
+
+New files:
+- api/whatsapp/webhook.php
+- api/whatsapp/fdr_fitment.json
+- database/phase18_whatsapp_ai.sql
+- README_WHATSAPP_AI_PHASE18_PHASE2.md
+- README_PEMBARUAN_PHASE18_WHATSAPP_WEBHOOK.md
+- MANIFEST_PHASE18.txt
+
+Updated files:
+- api/whatsapp/catalog.php
+- config.local.example.php
+- README_WHATSAPP_AI_PHASE17_PHASE1.md (historical note updated)
+
+No real credentials (config.local.php, API token, Fonnte token, AI provider key) are included.
