@@ -480,34 +480,66 @@ require_once __DIR__ . '/includes/navbar.php';
                         $applicationUrl = trim((string) ($job['application_url'] ?? ''));
                         $applicationLabel = trim((string) ($job['application_label'] ?? '')) ?: 'Lamar Sekarang';
                         ?>
-                        <article class="career-job-card" data-aos="fade-up">
+                        <article class="career-job-card" data-aos="fade-up" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Lihat detail lowongan <?= e($jobTitle); ?>">
                             <?php if ($jobPosterUrl !== ''): ?>
-                                <div class="career-job-poster">
-                                    <img src="<?= e($jobPosterUrl); ?>" alt="<?= e($jobTitle); ?>" loading="lazy">
+                                <div class="career-job-card-poster">
+                                    <img src="<?= e($jobPosterUrl); ?>" alt="Poster lowongan <?= e($jobTitle); ?>" loading="lazy">
+                                </div>
+                            <?php else: ?>
+                                <div class="career-job-card-poster career-job-card-poster-empty" aria-hidden="true">
+                                    <i class="fa-solid fa-briefcase"></i>
                                 </div>
                             <?php endif; ?>
-
                             <div class="career-job-body">
+                                <span class="career-job-kicker">LOWONGAN PEKERJAAN</span>
                                 <h3><?= e($jobTitle); ?></h3>
                                 <?php if ($jobExcerpt !== ''): ?>
                                     <p class="career-job-excerpt"><?= e($jobExcerpt); ?></p>
                                 <?php endif; ?>
-                                <?php if ($jobDescription !== ''): ?>
-                                    <div class="career-job-description rich-content"><?= $jobDescription; ?></div>
-                                <?php endif; ?>
-
-                                <?php if ($applicationUrl !== ''): ?>
-                                    <a class="btn btn-primary career-apply-button"
-                                       href="<?= e($applicationUrl); ?>"
-                                       target="_blank"
-                                       rel="noopener noreferrer">
-                                        <?= e($applicationLabel); ?>
-                                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                    </a>
-                                <?php endif; ?>
+                                <span class="career-job-more">
+                                    Lihat Selengkapnya
+                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                </span>
                             </div>
+
+                            <template class="career-job-detail-template">
+                                <?php if ($jobPosterUrl !== ''): ?>
+                                    <div class="career-job-poster">
+                                        <img src="<?= e($jobPosterUrl); ?>" alt="<?= e($jobTitle); ?>">
+                                    </div>
+                                <?php endif; ?>
+                                <div class="career-job-detail-content">
+                                    <span class="career-job-kicker">LOWONGAN PEKERJAAN</span>
+                                    <h2 id="careerJobModalTitle"><?= e($jobTitle); ?></h2>
+                                    <?php if ($jobExcerpt !== ''): ?>
+                                        <p class="career-job-detail-excerpt"><?= e($jobExcerpt); ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($jobDescription !== ''): ?>
+                                        <div class="career-job-description rich-content"><?= $jobDescription; ?></div>
+                                    <?php endif; ?>
+                                    <?php if ($applicationUrl !== ''): ?>
+                                        <a class="btn btn-primary career-apply-button"
+                                           href="<?= e($applicationUrl); ?>"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <?= e($applicationLabel); ?>
+                                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </template>
                         </article>
                     <?php endforeach; ?>
+                </div>
+
+                <div class="career-job-modal" id="careerJobModal" role="dialog" aria-modal="true" aria-labelledby="careerJobModalTitle" hidden>
+                    <div class="career-job-modal-backdrop" data-close-career-modal></div>
+                    <div class="career-job-modal-dialog">
+                        <button class="career-job-modal-close" type="button" aria-label="Tutup detail lowongan" data-close-career-modal>
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div class="career-job-modal-content" id="careerJobModalContent"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -618,6 +650,86 @@ require_once __DIR__ . '/includes/navbar.php';
 
 </main>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var modal = document.getElementById('careerJobModal');
+    var modalContent = document.getElementById('careerJobModalContent');
+    var lastFocusedCard = null;
+    if (!modal || !modalContent) return;
+
+    function openCareerModal(card) {
+        var template = card.querySelector('.career-job-detail-template');
+        if (!template) return;
+        lastFocusedCard = card;
+        modalContent.replaceChildren(template.content.cloneNode(true));
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+
+        if (window.innerWidth >= 768 && window.matchMedia('(orientation: landscape)').matches) {
+            var dialog = modal.querySelector('.career-job-modal-dialog');
+            var detailContent = modalContent.querySelector('.career-job-detail-content');
+            var poster = modalContent.querySelector('.career-job-poster');
+            var modalHeight = Math.min(720, window.innerHeight - 48);
+
+            if (dialog) {
+                dialog.style.height = modalHeight + 'px';
+                dialog.style.maxHeight = 'calc(100vh - 48px)';
+                dialog.style.overflow = 'hidden';
+            }
+            modalContent.style.height = '100%';
+            if (poster) {
+                poster.style.position = 'relative';
+                poster.style.top = 'auto';
+                poster.style.height = '100%';
+                poster.style.minHeight = '420px';
+            }
+            if (detailContent) {
+                detailContent.style.height = '100%';
+                detailContent.style.overflowY = 'auto';
+                detailContent.style.overscrollBehavior = 'contain';
+            }
+        }
+
+        var closeButton = modal.querySelector('.career-job-modal-close');
+        if (closeButton) closeButton.focus();
+    }
+
+    function closeCareerModal() {
+        modal.hidden = true;
+        modalContent.replaceChildren();
+        document.body.style.overflow = '';
+        var dialog = modal.querySelector('.career-job-modal-dialog');
+        if (dialog) {
+            dialog.style.removeProperty('height');
+            dialog.style.removeProperty('max-height');
+            dialog.style.removeProperty('overflow');
+        }
+        modalContent.style.removeProperty('height');
+        if (lastFocusedCard) lastFocusedCard.focus();
+        lastFocusedCard = null;
+    }
+
+    document.querySelectorAll('.career-job-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+            openCareerModal(card);
+        });
+        card.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openCareerModal(card);
+            }
+        });
+    });
+
+    modal.querySelectorAll('[data-close-career-modal]').forEach(function (element) {
+        element.addEventListener('click', closeCareerModal);
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !modal.hidden) closeCareerModal();
+    });
+});
+</script>
 
 <?php
 // =========================================================
