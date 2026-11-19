@@ -84,9 +84,10 @@ $sections = [
         'label' => 'CAREER',
         'title' => 'Karir',
         'icon'  => 'fa-briefcase',
-        'description' => 'Kelola judul SEO, isi halaman karir, ringkasan, dan gambar utama.',
+        'description' => 'Kelola judul SEO, isi halaman karir, poster lowongan, deskripsi, tautan lamar, dan gambar utama.',
         'public_url' => 'career.php',
         'manage' => [
+            ['label' => 'Kelola Lowongan', 'url' => 'careers.php', 'icon' => 'fa-user-plus'],
             ['label' => 'Daftar Halaman CMS', 'url' => 'pages.php', 'icon' => 'fa-file-lines']
         ]
     ],

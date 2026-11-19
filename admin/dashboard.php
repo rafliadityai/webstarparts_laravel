@@ -3601,6 +3601,25 @@ if (
                     WEBSITE
                 </span>
 
+                <a
+                    href="<?= e(
+                        base_url(
+                            'admin/careers.php'
+                        )
+                    ); ?>"
+                    class="sidebar-link"
+                >
+
+                    <i
+                        class="fa-solid fa-briefcase"
+                    ></i>
+
+                    <span>
+                        Lowongan Karir
+                    </span>
+
+                </a>
+
 
                 <a
                     href="<?= e(

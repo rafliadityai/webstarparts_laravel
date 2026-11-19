@@ -143,6 +143,28 @@ $careerImageUrl =
         ? media_url($careerImage)
         : '';
 
+/*
+|--------------------------------------------------------------------------
+| CAREER JOB LISTINGS
+|--------------------------------------------------------------------------
+*/
+
+$careerJobs = [];
+
+try {
+    $jobsStmt = $pdo->prepare(
+        "SELECT id, title, slug, poster, excerpt, description,
+                application_url, application_label, published_at
+         FROM career_jobs
+         WHERE status = 'published'
+         ORDER BY sort_order ASC, COALESCE(published_at, created_at) DESC, id DESC"
+    );
+    $jobsStmt->execute();
+    $careerJobs = $jobsStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    $careerJobs = [];
+}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -437,6 +459,58 @@ require_once __DIR__ . '/includes/navbar.php';
 
         </section>
 
+    <?php endif; ?>
+
+    <?php if (!empty($careerJobs)): ?>
+        <section class="section section-light career-vacancies">
+            <div class="container">
+                <div class="section-header" data-aos="fade-up">
+                    <span class="section-kicker">LOWONGAN TERSEDIA</span>
+                    <h2 class="section-title">Posisi yang Sedang Dibuka</h2>
+                </div>
+
+                <div class="career-job-grid">
+                    <?php foreach ($careerJobs as $job): ?>
+                        <?php
+                        $jobTitle = trim((string) ($job['title'] ?? ''));
+                        $jobExcerpt = trim((string) ($job['excerpt'] ?? ''));
+                        $jobDescription = trim((string) ($job['description'] ?? ''));
+                        $jobPoster = trim((string) ($job['poster'] ?? ''));
+                        $jobPosterUrl = $jobPoster !== '' ? media_url($jobPoster) : '';
+                        $applicationUrl = trim((string) ($job['application_url'] ?? ''));
+                        $applicationLabel = trim((string) ($job['application_label'] ?? '')) ?: 'Lamar Sekarang';
+                        ?>
+                        <article class="career-job-card" data-aos="fade-up">
+                            <?php if ($jobPosterUrl !== ''): ?>
+                                <div class="career-job-poster">
+                                    <img src="<?= e($jobPosterUrl); ?>" alt="<?= e($jobTitle); ?>" loading="lazy">
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="career-job-body">
+                                <h3><?= e($jobTitle); ?></h3>
+                                <?php if ($jobExcerpt !== ''): ?>
+                                    <p class="career-job-excerpt"><?= e($jobExcerpt); ?></p>
+                                <?php endif; ?>
+                                <?php if ($jobDescription !== ''): ?>
+                                    <div class="career-job-description rich-content"><?= $jobDescription; ?></div>
+                                <?php endif; ?>
+
+                                <?php if ($applicationUrl !== ''): ?>
+                                    <a class="btn btn-primary career-apply-button"
+                                       href="<?= e($applicationUrl); ?>"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <?= e($applicationLabel); ?>
+                                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
     <?php endif; ?>
 
 
