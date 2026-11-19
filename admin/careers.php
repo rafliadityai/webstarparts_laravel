@@ -195,7 +195,10 @@ if (is_post()) {
 }
 
 $editJob = null;
-$editId = get_int('id');
+$editId = get_int('edit');
+if ($editId <= 0) {
+    $editId = get_int('id');
+}
 if ($editId > 0) {
     $stmt = $pdo->prepare("SELECT * FROM career_jobs WHERE id = ? LIMIT 1");
     $stmt->execute([$editId]);
@@ -283,7 +286,7 @@ $jobs = $pdo->query(
                                 <?php if ($poster !== ''): ?><img class="job-thumb" src="<?= e(media_url($poster)); ?>" alt=""><?php else: ?><div class="job-thumb"></div><?php endif; ?>
                                 <div><h3><?= e((string) $job['title']); ?></h3><p><?= $job['status'] === 'published' ? 'Published' : 'Draft'; ?> · Urutan <?= (int) $job['sort_order']; ?></p></div>
                                 <div class="job-tools">
-                                    <a class="icon-btn" href="<?= e($listUrl . '?edit=' . (int) $job['id']); ?>#career-form" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                                    <a class="icon-btn" href="<?= e($listUrl . '?id=' . (int) $job['id']); ?>#career-form" title="Edit"><i class="fa-solid fa-pen"></i></a>
                                     <form method="post" onsubmit="return confirm('Hapus lowongan ini?');"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()); ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int) $job['id']; ?>"><button class="icon-btn delete-btn" type="submit" title="Hapus"><i class="fa-solid fa-trash"></i></button></form>
                                 </div>
                             </article>
