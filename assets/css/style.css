@@ -4063,38 +4063,32 @@ p {
         850px;
 }
 
+.page-hero-content h1,
 .page-hero-title {
-    margin-bottom:
-        12px;
-
-    color:
-        var(--spm-white);
-
-    font-size:
-        clamp(
-            34px,
-            5vw,
-            58px
-        );
-
-    font-weight:
-        800;
+    margin-bottom: 12px;
+    color: var(--spm-white, #ffffff) !important;
+    font-size: clamp(34px, 5vw, 58px);
+    font-weight: 800;
+    line-height: 1.15;
 }
 
+.page-hero-content p,
 .page-hero-description {
-    margin:
-        0;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-size: 15px;
+    line-height: 1.7;
+}
 
-    color:
-        rgba(
-            255,
-            255,
-            255,
-            0.66
-        );
-
-    font-size:
-        14px;
+.page-hero-content .eyebrow,
+.page-hero-content .section-kicker {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: var(--spm-red-light, #ff3b30);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
 }
 
 .breadcrumb {
@@ -5521,6 +5515,7 @@ p {
             65px 0;
     }
 
+    .page-hero-content h1,
     .page-hero-title {
         font-size:
             clamp(
@@ -6815,13 +6810,22 @@ main > section,
 .brand-logo-compact .brand-logo-image,.mobile-menu-brand-compact .brand-logo-image{display:none!important}
 /* The slogan above the brand has intentionally been removed. */
 .fdr-mega-brands-column{grid-column:span 2;min-width:0}
-.fdr-mega-brand-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;align-items:stretch}
-.fdr-brand-card{position:relative;display:flex;min-width:0;min-height:132px;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:15px 10px 18px;border:1px solid rgba(255,255,255,.14);border-radius:9px;text-align:center;color:#fff!important;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
-.fdr-brand-card:hover,.fdr-brand-card:focus-visible{transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,.28);filter:brightness(1.06);color:#fff!important}
-.fdr-brand-card img{display:block;width:100%;max-width:156px;height:38px;object-fit:contain;object-position:center}
+.fdr-mega-brand-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+.fdr-brand-card{position:relative;display:flex;min-width:0;min-height:132px;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px 12px 18px;border:1px solid rgba(255,255,255,.14);border-radius:10px;text-align:center;color:#fff!important;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
+.fdr-brand-card:hover,.fdr-brand-card:focus-visible{transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,.28);filter:brightness(1.05)}
+.fdr-brand-card img{display:block;width:100%;max-width:148px;height:38px;object-fit:contain;object-position:center}
 .fdr-brand-card span{font-size:11px;line-height:1.2;font-weight:900;letter-spacing:.11em}
-.fdr-brand-card>i{position:absolute;right:10px;bottom:9px;font-size:10px;opacity:.85}
-.fdr-brand-tire{background:linear-gradient(145deg,#e20b18,#a8000c)}
+.fdr-brand-card>i{position:absolute;right:11px;bottom:9px;font-size:10px;opacity:.85}
+.fdr-brand-wordmark{display:flex;align-items:center;justify-content:center;height:38px;font-size:15px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.fdr-brand-tire{background:linear-gradient(145deg,#e20b18,#a8000c);color:#fff!important}
+.fdr-brand-osram{background:linear-gradient(145deg,#ffffff,#f1f3f6);border:1px solid rgba(255,255,255,.35);color:#1a1a1a!important}
+.fdr-brand-osram span{color:#e65100}
+.fdr-brand-osram>i{color:#e65100;opacity:.9}
+.fdr-brand-osram:hover,.fdr-brand-osram:focus-visible{color:#1a1a1a!important;background:#ffffff}
+.fdr-brand-hqfederal{background:linear-gradient(145deg,#232528,#121315);color:#fff!important;border:1px solid rgba(255,255,255,.15)}
+.fdr-brand-rotary{background:linear-gradient(145deg,#133b6b,#0a2140);color:#fff!important}
+.fdr-brand-tayori{background:linear-gradient(145deg,#1d4f91,#103463);color:#fff!important}
+.fdr-brand-rakuda{background:linear-gradient(145deg,#2c3e50,#1a252f);color:#fff!important}
 .fdr-brand-ultimate{background:linear-gradient(145deg,#242528,#08090b)}
 .fdr-brand-champion{background:linear-gradient(145deg,#d4c742,#9f9418);color:#fff!important}
 .osram-mega-logo-link{min-height:66px;background:#f5f5f5;border:1px solid rgba(255,255,255,.2);padding:8px 10px;border-radius:7px;color:#202020!important}
@@ -6830,17 +6834,19 @@ main > section,
 .osram-mega-logo-link small{font-size:8px;color:#656565;font-weight:700;letter-spacing:.04em}
 .osram-mega-logo-link>i{color:#444!important}
 .osram-mega-logo-link:hover{background:#fff;color:#111!important}
-.mobile-fdr-brand-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 8px;border-top:1px solid #ececec;border-bottom:1px solid #ececec}
-.mobile-fdr-brand-grid .fdr-brand-card{min-height:94px;padding:12px 5px 17px;border-radius:7px;gap:7px}
-.mobile-fdr-brand-grid .fdr-brand-card img{height:24px}
-.mobile-fdr-brand-grid .fdr-brand-card span{font-size:8px;letter-spacing:.05em}
-.mobile-fdr-brand-grid .fdr-brand-card>i{right:7px;bottom:6px;font-size:8px}
+.mobile-fdr-brand-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:12px 8px;border-top:1px solid #ececec;border-bottom:1px solid #ececec}
+.mobile-fdr-brand-grid .fdr-brand-card{min-height:92px;padding:12px 8px 16px;border-radius:8px;gap:7px}
+.mobile-fdr-brand-grid .fdr-brand-card img{height:25px;max-width:120px}
+.mobile-fdr-brand-grid .fdr-brand-card span{font-size:9.5px;letter-spacing:.06em}
+.mobile-fdr-brand-grid .fdr-brand-card>i{right:8px;bottom:6px;font-size:9px}
+.mobile-fdr-brand-grid .fdr-brand-wordmark{height:25px;font-size:12px}
+.mobile-fdr-brand-grid .fdr-brand-osram{border:1px solid #e2e8f0;box-shadow:0 2px 6px rgba(0,0,0,.06)}
 /* Hide the obsolete slogan styling if cached legacy markup exists on a page. */
 .hero-kicker{display:none!important}
-@media(max-width:1360px){.fdr-mega-brands-column{grid-column:span 2}.fdr-mega-brand-grid{gap:8px}.fdr-brand-card{min-height:118px;padding:11px 7px 17px}.fdr-brand-card img{height:31px}}
-@media(max-width:992px){.fdr-mega-brands-column{grid-column:auto}.fdr-mega-brand-grid{grid-template-columns:1fr}.fdr-brand-card{min-height:95px}}
-@media(max-width:767px){.brand-logo-compact{max-width:165px}.brand-logo-text-only strong{font-size:14px}.brand-logo-text-only small{font-size:9px}.mobile-fdr-brand-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.mobile-fdr-brand-grid .fdr-brand-card{min-height:82px}}
-@media(max-width:360px){.mobile-fdr-brand-grid{grid-template-columns:1fr}.mobile-fdr-brand-grid .fdr-brand-card{min-height:70px;flex-direction:row;justify-content:flex-start;padding:10px 13px}.mobile-fdr-brand-grid .fdr-brand-card img{width:100px;height:25px}.mobile-fdr-brand-grid .fdr-brand-card span{margin-left:auto;font-size:9px}.mobile-fdr-brand-grid .fdr-brand-card>i{position:static;margin-left:3px}}
+@media(max-width:1360px){.fdr-mega-brands-column{grid-column:span 2}.fdr-mega-brand-grid{gap:9px}.fdr-brand-card{min-height:118px;padding:12px 8px 16px}.fdr-brand-card img{height:32px;max-width:130px}}
+@media(max-width:992px){.fdr-mega-brands-column{grid-column:auto}.fdr-mega-brand-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fdr-brand-card{min-height:95px}}
+@media(max-width:767px){.brand-logo-compact{max-width:165px}.brand-logo-text-only strong{font-size:14px}.brand-logo-text-only small{font-size:9px}.mobile-fdr-brand-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mobile-fdr-brand-grid .fdr-brand-card{min-height:86px}}
+@media(max-width:360px){.mobile-fdr-brand-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.mobile-fdr-brand-grid .fdr-brand-card{min-height:78px;padding:10px 6px 14px}.mobile-fdr-brand-grid .fdr-brand-card img{height:22px;max-width:95px}.mobile-fdr-brand-grid .fdr-brand-card span{font-size:8.5px}}
 
 .about-grid-no-visual{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
 .about-grid-no-visual .about-content{max-width:900px}
@@ -6858,7 +6864,7 @@ main > section,
 .brand-logo-compact .brand-logo-header-image,.mobile-menu-brand-compact .brand-logo-header-image{display:block!important;width:220px;max-width:100%;height:auto;max-height:43px;object-fit:contain;object-position:left center}
 .mobile-menu-brand-compact{display:flex;align-items:center;min-width:0;max-width:220px;min-height:42px;padding:4px 0;overflow:hidden}
 .mobile-menu-brand-compact .brand-logo-header-image{width:195px;max-height:38px}
-/* The top brand ticker (FDR / OSRAM / Tayori / Rakuda) was removed; place stats cleanly after the hero. */
+/* The top brand ticker (FDR / OSRAM / Tayori / hq-federal) was removed; place stats cleanly after the hero. */
 .home-page .stats-section{padding-top:22px}
 .home-page .stats-wrapper{margin-top:0}
 /* Brand partners display actual brand logos or typographic wordmarks, never product photos. */
@@ -6866,7 +6872,7 @@ main > section,
 .brand-card-logo{display:block!important;width:auto!important;max-width:min(100%,210px)!important;height:76px!important;max-height:76px!important;object-fit:contain!important;object-position:center!important}
 .brand-card-wordmark{display:flex;align-items:center;justify-content:center;min-width:125px;min-height:64px;padding:12px 16px;font-size:clamp(20px,2vw,29px);font-weight:900;letter-spacing:.04em;line-height:1;text-align:center;font-family:Arial,Helvetica,sans-serif}
 .brand-wordmark-tayori{color:#1d4f91;text-shadow:0 1px 0 rgba(0,0,0,.06)}
-.brand-wordmark-rakuda{color:#d20a16;text-shadow:0 1px 0 rgba(0,0,0,.06)}
+.brand-wordmark-hq-federal{color:#d20a16;text-shadow:0 1px 0 rgba(0,0,0,.06)}
 .brand-wordmark-generic{color:#202020}
 .brand-card-logo-only .brand-card-title{display:none!important}
 @media(max-width:767px){.brand-logo-compact{max-width:188px;min-height:42px}.brand-logo-compact .brand-logo-header-image{width:175px;max-height:34px}.mobile-menu-brand-compact{max-width:190px}.mobile-menu-brand-compact .brand-logo-header-image{width:170px;max-height:34px}.home-page .stats-section{padding-top:18px}.brand-card-logo-only{min-height:125px;padding:18px 14px}.brand-card-logo{height:58px!important;max-height:58px!important}.brand-card-wordmark{min-height:52px;min-width:105px;font-size:22px}}
@@ -7034,3 +7040,401 @@ main > section,
         white-space: normal;
     }
 }
+
+/* =========================================================
+   ARTICLE / BLOG BODY STYLING (news-detail.php)
+   Mendukung format posting modern: foto & link di tengah paragraf
+========================================================= */
+.news-article-body {
+    color: #2c3038;
+}
+
+.news-article-body p {
+    margin-bottom: 22px;
+    font-size: 15px;
+    line-height: 1.85;
+    color: #374151;
+}
+
+.news-article-body h2,
+.news-article-body h3,
+.news-article-body h4 {
+    margin: 36px 0 16px;
+    color: #111827;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.news-article-body h2 {
+    font-size: clamp(22px, 2.5vw, 28px);
+    border-bottom: 2px solid #f1f3f5;
+    padding-bottom: 10px;
+}
+
+.news-article-body h3 {
+    font-size: clamp(18px, 2vw, 22px);
+}
+
+.news-article-body a {
+    color: var(--spm-red, #e20b18);
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.news-article-body a:hover {
+    color: #b8000b;
+}
+
+.news-article-body img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin: 28px auto;
+    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.08);
+}
+
+.news-article-body figure {
+    margin: 28px auto;
+    max-width: 100%;
+    text-align: center;
+}
+
+.news-article-body figure img {
+    margin: 0 auto 10px;
+}
+
+.news-article-body figcaption {
+    font-size: 13px;
+    color: #6b7280;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.news-article-body blockquote {
+    position: relative;
+    margin: 28px 0;
+    padding: 18px 24px;
+    background: #f8fafc;
+    border-left: 4px solid var(--spm-red, #e20b18);
+    border-radius: 0 8px 8px 0;
+    color: #4b5563;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.news-article-body ul,
+.news-article-body ol {
+    margin: 16px 0 24px 24px;
+    padding-left: 8px;
+    color: #374151;
+}
+
+.news-article-body li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+}
+
+.news-article-body hr {
+    margin: 36px 0;
+    border: 0;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+.news-article-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+}
+
+.news-article-body th,
+.news-article-body td {
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.news-article-body th {
+    background: #f9fafb;
+    font-weight: 700;
+}
+
+/* =========================================================
+   JARINGAN DISTRIBUSI (HOME & ABOUT) RESPONSIVE
+========================================================= */
+.distribution-grid {
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.distribution-content {
+    min-width: 0;
+}
+
+.distribution-kicker {
+    color: #ff3b3b !important;
+}
+
+.distribution-title {
+    color: #ffffff !important;
+}
+
+.distribution-title span {
+    color: var(--spm-red, #e20b18);
+}
+
+.distribution-description {
+    margin-left: 0 !important;
+    color: rgba(255, 255, 255, 0.65) !important;
+    max-width: 540px;
+}
+
+.distribution-features-list {
+    margin-top: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.distribution-feature-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.distribution-feature-icon {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--spm-red, #e20b18);
+    border-radius: 11px;
+    color: #ffffff;
+    font-size: 17px;
+    box-shadow: 0 4px 12px rgba(226, 11, 24, 0.25);
+}
+
+.distribution-feature-text strong {
+    display: block;
+    color: #ffffff;
+    font-family: var(--spm-font);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.distribution-feature-text span {
+    display: block;
+    margin-top: 2px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.distribution-cta {
+    margin-top: 28px;
+}
+
+.distribution-visual {
+    min-width: 0;
+    width: 100%;
+}
+
+.distribution-card {
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 38px 30px;
+    text-align: center;
+    background: #1c1c1c;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.distribution-card:hover {
+    border-color: rgba(226, 11, 24, 0.35);
+}
+
+.distribution-card-fallback {
+    background: radial-gradient(circle at center, rgba(217, 0, 0, 0.18), transparent 45%), #1b1b1b;
+}
+
+.distribution-card-icon {
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    color: #ffffff;
+    background: var(--spm-red, #e20b18);
+    border-radius: 18px;
+    font-size: 25px;
+    box-shadow: 0 8px 20px rgba(226, 11, 24, 0.35);
+}
+
+.distribution-card-title {
+    margin-bottom: 8px;
+    color: #ffffff;
+    font-family: var(--spm-font);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.distribution-card-address {
+    max-width: 480px;
+    margin: 0 auto;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.distribution-card-btn {
+    margin-top: 22px;
+}
+
+/* Tablet (768px - 992px) */
+@media (max-width: 992px) {
+    .distribution-grid {
+        grid-template-columns: 1fr !important;
+        gap: 40px !important;
+    }
+
+    .distribution-description {
+        max-width: 100%;
+    }
+
+    .distribution-features-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .distribution-feature-row {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 14px 16px;
+        border-radius: 14px;
+    }
+
+    .distribution-card {
+        min-height: auto;
+        padding: 38px 28px;
+        max-width: 620px;
+        margin: 0 auto;
+    }
+}
+
+/* Mobile (<= 767px) */
+@media (max-width: 767px) {
+    .distribution-grid {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+    }
+
+    .distribution-title {
+        font-size: clamp(22px, 6vw, 28px) !important;
+        line-height: 1.25 !important;
+        margin-bottom: 12px !important;
+    }
+
+    .distribution-description {
+        font-size: 13.5px !important;
+        line-height: 1.6 !important;
+    }
+
+    .distribution-features-list {
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: none;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .distribution-feature-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 12px 14px;
+        border-radius: 12px;
+    }
+
+    .distribution-feature-icon {
+        flex: 0 0 38px;
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+        border-radius: 10px;
+    }
+
+    .distribution-feature-text strong {
+        font-size: 13px;
+    }
+
+    .distribution-feature-text span {
+        font-size: 11.5px;
+        line-height: 1.45;
+    }
+
+    .distribution-cta {
+        margin-top: 20px;
+    }
+
+    .distribution-cta .btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 46px;
+        font-size: 13px;
+    }
+
+    .distribution-card {
+        min-height: auto;
+        padding: 26px 18px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .distribution-card-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        font-size: 20px;
+        margin: 0 auto 14px;
+    }
+
+    .distribution-card-title {
+        font-size: 18px;
+        margin-bottom: 6px;
+    }
+
+    .distribution-card-address {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .distribution-card-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 46px;
+        font-size: 13px;
+        margin-top: 18px;
+    }
+}
+
+
+

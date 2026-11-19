@@ -702,7 +702,7 @@ try {
                                     )
                                 ); ?>"
                             >
-                                Rakuda
+                                HQ-Federal
                             </a>
 
                         <?php endif; ?>

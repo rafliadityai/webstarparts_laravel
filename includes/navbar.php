@@ -168,6 +168,8 @@ if (
 }
 
 
+
+
 /*
 |------------------------------------------------------------------
 | CURRENT PAGE
@@ -247,6 +249,86 @@ $navCategories = array_slice(
     0,
     12
 );
+
+/*
+|------------------------------------------------------------------
+| BRAND LINES (PILIH LINI PRODUK)
+|------------------------------------------------------------------
+| Data lini produk / brand partner untuk dropdown navigasi.
+| Berbasis array agar dinamis dan mudah menambah brand baru:
+| HQ Federal, Rotary, Tayori, Rakuda, dll.
+|------------------------------------------------------------------
+*/
+
+$navBrandLines = [
+    [
+        'id'       => 'fdr-tire',
+        'name'     => 'FDR Tire',
+        'label'    => 'FDR TIRE',
+        'url'      => 'products.php?category=fdr-tire#product-list',
+        'logo'     => 'uploads/general/fdr-tire-logo-white.png',
+        'class'    => 'fdr-brand-tire',
+    ],
+    [
+        'id'       => 'osram',
+        'name'     => 'OSRAM',
+        'label'    => 'OSRAM',
+        'url'      => 'products.php?category=osram#product-list',
+        'logo'     => 'uploads/general/logo-osram.png',
+        'class'    => 'fdr-brand-osram',
+    ],
+    [
+        'id'       => 'hq-federal',
+        'name'     => 'HQ Federal',
+        'label'    => 'HQ FEDERAL',
+        'url'      => 'products.php?category=hq-federal#product-list',
+        'logo'     => 'uploads/general/logo-hqfederal.png',
+        'class'    => 'fdr-brand-hqfederal',
+    ],
+     [
+        'id'       => 'rotary',
+        'name'     => 'Rotary',
+        'label'    => 'ROTARY',
+        'url'      => 'products.php?category=rotary#product-list',
+        'logo'     => 'uploads/general/logo-rotary.png',
+        'class'    => 'fdr-brand-rotary',
+    ],
+    /*
+    // Tambah brand baru cukup uncomment / copy format di bawah ini:
+    [
+        'id'       => 'hq-federal',
+        'name'     => 'HQ Federal',
+        'label'    => 'HQ FEDERAL',
+        'url'      => 'products.php?category=hq-federal#product-list',
+        'logo'     => 'uploads/general/logo-hqfederal.png',
+        'class'    => 'fdr-brand-hqfederal',
+    ],
+    [
+        'id'       => 'rotary',
+        'name'     => 'Rotary',
+        'label'    => 'ROTARY',
+        'url'      => 'products.php?category=rotary#product-list',
+        'logo'     => 'uploads/general/logo-rotary.png',
+        'class'    => 'fdr-brand-rotary',
+    ],
+    [
+        'id'       => 'tayori',
+        'name'     => 'Tayori',
+        'label'    => 'TAYORI',
+        'url'      => 'products.php?category=tayori#product-list',
+        'logo'     => 'uploads/categories/tayori-cabt-nobg_20261022153733_3ad1144b.png',
+        'class'    => 'fdr-brand-tayori',
+    ],
+    [
+        'id'       => 'rakuda',
+        'name'     => 'Rakuda',
+        'label'    => 'RAKUDA',
+        'url'      => 'products.php?category=rakuda#product-list',
+        'logo'     => '',
+        'class'    => 'fdr-brand-rakuda',
+    ],
+    */
+];
 
 /*
 |------------------------------------------------------------------
@@ -895,25 +977,29 @@ $navEscape = static function (
                                         <div class="fdr-mega-column-spacer" aria-hidden="true"></div>
                                         <a class="fdr-mega-link" href="<?= $navEscape(base_url('products.php?browse=tubetype#product-list')); ?>"><span>Tubetype Tire</span><i class="fa-solid fa-chevron-right"></i></a>
                                         <a class="fdr-mega-link" href="<?= $navEscape(base_url('products.php?browse=tubeless#product-list')); ?>"><span>Tubeless Tire</span><i class="fa-solid fa-chevron-right"></i></a>
-                                        <div class="osram-mega-divider"><span>LIGHTING</span></div>
-                                        <a class="fdr-mega-link osram-mega-link osram-mega-logo-link" href="<?= $navEscape(base_url('products.php?category=osram#product-list')); ?>"><span><img src="<?= $navEscape(media_url('uploads/general/logo-osram.png')); ?>" alt="OSRAM" loading="lazy"><small>Automotive Lighting</small></span><i class="fa-solid fa-chevron-right"></i></a>
                                     </section>
 
-                                    <section class="fdr-mega-column fdr-mega-brands-column" aria-label="Lini produk FDR">
+                                    <section class="fdr-mega-column fdr-mega-brands-column" aria-label="Pilih lini produk">
                                         <h2>PILIH LINI PRODUK</h2>
                                         <div class="fdr-mega-brand-grid">
-                                            <a class="fdr-brand-card fdr-brand-tire" href="<?= $navEscape(base_url('products.php?category=fdr-tire#product-list')); ?>">
-                                                <img src="<?= $navEscape(media_url('uploads/general/fdr-tire-logo-white.png')); ?>" alt="FDR Tire" loading="lazy">
-                                                <span>FDR TIRE</span><i class="fa-solid fa-arrow-right"></i>
-                                            </a>
-                                            <a class="fdr-brand-card fdr-brand-ultimate" href="<?= $navEscape(base_url('products.php?category=fdr-ultimate#product-list')); ?>">
-                                                <img src="<?= $navEscape(media_url('uploads/general/fdr-tire-logo-white.png')); ?>" alt="FDR" loading="lazy">
-                                                <span>ULTIMATE</span><i class="fa-solid fa-arrow-right"></i>
-                                            </a>
-                                            <a class="fdr-brand-card fdr-brand-champion" href="<?= $navEscape(base_url('products.php?category=fdr-champion#product-list')); ?>">
-                                                <img src="<?= $navEscape(media_url('uploads/general/fdr-tire-logo-white.png')); ?>" alt="FDR" loading="lazy">
-                                                <span>CHAMPION</span><i class="fa-solid fa-arrow-right"></i>
-                                            </a>
+                                            <?php foreach ($navBrandLines as $brandItem): ?>
+                                                <?php
+                                                $bName  = trim((string)($brandItem['name'] ?? ''));
+                                                $bLabel = trim((string)($brandItem['label'] ?? $bName));
+                                                $bUrl   = trim((string)($brandItem['url'] ?? '#'));
+                                                $bLogo  = trim((string)($brandItem['logo'] ?? ''));
+                                                $bClass = trim((string)($brandItem['class'] ?? ''));
+                                                ?>
+                                                <a class="fdr-brand-card <?= $navEscape($bClass); ?>" href="<?= $navEscape(base_url($bUrl)); ?>">
+                                                    <?php if ($bLogo !== ''): ?>
+                                                        <img src="<?= $navEscape(media_url($bLogo)); ?>" alt="<?= $navEscape($bName); ?>" loading="lazy">
+                                                    <?php else: ?>
+                                                        <span class="fdr-brand-wordmark"><?= $navEscape($bName); ?></span>
+                                                    <?php endif; ?>
+                                                    <span><?= $navEscape($bLabel); ?></span>
+                                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                                </a>
+                                            <?php endforeach; ?>
                                         </div>
                                     </section>
                                 </div>
@@ -1122,32 +1208,6 @@ $navEscape = static function (
         <div
             class="navbar-actions"
         >
-
-            <?php if (
-                $navWhatsappLink !== '#'
-            ): ?>
-
-                <a
-                    href="<?= $navEscape(
-                        $navWhatsappLink
-                    ); ?>"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="top-bar-whatsapp"
-                    aria-label="WhatsApp Star Parts Motor"
-                >
-
-                    <i
-                        class="fa-brands fa-whatsapp"
-                    ></i>
-
-                    <span>
-                        WhatsApp
-                    </span>
-
-                </a>
-
-            <?php endif; ?>
 
 
             <a
@@ -1568,24 +1628,29 @@ $navEscape = static function (
                                     <a href="<?= $navEscape(base_url('products.php?browse=inner#product-list')); ?>">Inner Tire <i class="fa-solid fa-chevron-right"></i></a>
                                     <a href="<?= $navEscape(base_url('products.php?browse=tubetype#product-list')); ?>">Tubetype Tire <i class="fa-solid fa-chevron-right"></i></a>
                                     <a href="<?= $navEscape(base_url('products.php?browse=tubeless#product-list')); ?>">Tubeless Tire <i class="fa-solid fa-chevron-right"></i></a>
-                                    <a class="mobile-osram-lighting-link mobile-osram-logo-link" href="<?= $navEscape(base_url('products.php?category=osram#product-list')); ?>"><span><img src="<?= $navEscape(media_url('uploads/general/logo-osram.png')); ?>" alt="OSRAM" loading="lazy"><small>Automotive Lighting</small></span><i class="fa-solid fa-chevron-right"></i></a>
                                 </div>
                             <?php endif; ?>
 
                             <?php if ($mobileIsProduct): ?>
-                                <div class="mobile-fdr-brand-grid" aria-label="Pilih lini produk FDR">
-                                    <a class="fdr-brand-card fdr-brand-tire" href="<?= $navEscape(base_url('products.php?category=fdr-tire#product-list')); ?>">
-                                        <img src="<?= $navEscape(media_url('uploads/general/fdr-tire-logo-white.png')); ?>" alt="FDR Tire" loading="lazy">
-                                        <span>FDR TIRE</span><i class="fa-solid fa-arrow-right"></i>
-                                    </a>
-                                    <a class="fdr-brand-card fdr-brand-ultimate" href="<?= $navEscape(base_url('products.php?category=fdr-ultimate#product-list')); ?>">
-                                        <img src="<?= $navEscape(media_url('uploads/general/fdr-tire-logo-white.png')); ?>" alt="FDR" loading="lazy">
-                                        <span>ULTIMATE</span><i class="fa-solid fa-arrow-right"></i>
-                                    </a>
-                                    <a class="fdr-brand-card fdr-brand-champion" href="<?= $navEscape(base_url('products.php?category=fdr-champion#product-list')); ?>">
-                                        <img src="<?= $navEscape(media_url('uploads/general/fdr-tire-logo-white.png')); ?>" alt="FDR" loading="lazy">
-                                        <span>CHAMPION</span><i class="fa-solid fa-arrow-right"></i>
-                                    </a>
+                                <div class="mobile-fdr-brand-grid" aria-label="Pilih lini produk">
+                                    <?php foreach ($navBrandLines as $brandItem): ?>
+                                        <?php
+                                        $bName  = trim((string)($brandItem['name'] ?? ''));
+                                        $bLabel = trim((string)($brandItem['label'] ?? $bName));
+                                        $bUrl   = trim((string)($brandItem['url'] ?? '#'));
+                                        $bLogo  = trim((string)($brandItem['logo'] ?? ''));
+                                        $bClass = trim((string)($brandItem['class'] ?? ''));
+                                        ?>
+                                        <a class="fdr-brand-card <?= $navEscape($bClass); ?>" href="<?= $navEscape(base_url($bUrl)); ?>">
+                                            <?php if ($bLogo !== ''): ?>
+                                                <img src="<?= $navEscape(media_url($bLogo)); ?>" alt="<?= $navEscape($bName); ?>" loading="lazy">
+                                            <?php else: ?>
+                                                <span class="fdr-brand-wordmark"><?= $navEscape($bName); ?></span>
+                                            <?php endif; ?>
+                                            <span><?= $navEscape($bLabel); ?></span>
+                                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                        </a>
+                                    <?php endforeach; ?>
                                 </div>
                             <?php endif; ?>
 
@@ -1699,3 +1764,43 @@ $navEscape = static function (
     id="mobile-nav-overlay"
     aria-hidden="true"
 ></div>
+
+<!-- =========================================================
+     STICKY WHATSAPP BUTTON
+========================================================= -->
+<a
+    href="<?= $navEscape($navWhatsappLink !== '#' ? $navWhatsappLink : 'https://wa.me/6281111288889?text=' . rawurlencode('Halo Star Parts Motor, saya ingin mendapatkan informasi mengenai produk dan kerja sama.')); ?>"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="sticky-wa-button"
+    aria-label="Chat WhatsApp Star Parts Motor"
+    title="Hubungi kami via WhatsApp"
+>
+    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+    <span>WhatsApp</span>
+</a>
+
+<style>
+.sticky-wa-button {
+    position: fixed !important;
+    right: 24px !important;
+    bottom: 24px !important;
+    z-index: 99999 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    height: 48px !important;
+    padding: 0 20px !important;
+    background-color: #25D366 !important;
+    color: #ffffff !important;
+    border-radius: 999px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35) !important;
+}
+.sticky-wa-button i {
+    font-size: 22px !important;
+    line-height: 1 !important;
+}
+</style>

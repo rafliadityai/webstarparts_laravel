@@ -1058,7 +1058,7 @@ $bodyClass =
 */
 
 $allowedContentTags =
-    '<p><br><strong><b><em><i><u><ul><ol><li><blockquote><h2><h3><h4><h5><h6><hr><a><span><div><img>';
+    '<p><br><strong><b><em><i><u><s><ul><ol><li><blockquote><h2><h3><h4><h5><h6><hr><a><span><div><img><figure><figcaption><iframe><video><audio><source><table><thead><tbody><tr><th><td>';
 
 
 $renderedContent =
@@ -1068,6 +1068,11 @@ $renderedContent =
             $allowedContentTags
         )
         : '';
+
+// Jika teks artikel polos tanpa tag paragraf (misal artikel lama), otomatis konversi newlines ke <p>
+if ($renderedContent !== '' && !preg_match('/<\s*(?:p|div|h[1-6]|ul|ol|blockquote|table|figure)\b/i', $renderedContent)) {
+    $renderedContent = '<p>' . nl2br($renderedContent) . '</p>';
+}
 
 
 /*
@@ -1585,12 +1590,12 @@ require_once __DIR__ . '/includes/navbar.php';
                 <!-- ARTICLE BODY -->
 
                 <article
-                    class="about-text"
+                    class="about-text news-article-body"
                     data-aos="fade-up"
                     style="
                         max-width:820px;
                         margin:0 auto;
-                        font-size:14px;
+                        font-size:15px;
                         line-height:1.9;
                     "
                 >

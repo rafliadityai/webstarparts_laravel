@@ -17,6 +17,39 @@ if (!is_dir($uploadDir)) {
 
 /*
 |--------------------------------------------------------------------------
+| AJAX EDITOR IMAGE UPLOAD (TinyMCE)
+|--------------------------------------------------------------------------
+| Menangani upload gambar/foto di tengah paragraf artikel secara langsung.
+|--------------------------------------------------------------------------
+*/
+if (isset($_GET['action']) && $_GET['action'] === 'editor_upload') {
+    header('Content-Type: application/json; charset=utf-8');
+
+    if (!is_post() || empty($_FILES['file'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Tidak ada file gambar yang diunggah.']);
+        exit;
+    }
+
+    $upload = upload_image($_FILES['file'], 'posts');
+
+    if (empty($upload['success'])) {
+        http_response_code(400);
+        echo json_encode(['error' => $upload['message'] ?? 'Upload gambar gagal diproses.']);
+        exit;
+    }
+
+    // TinyMCE mengharapkan respon JSON: { "location": "URL_GAMBAR" }
+    $imageUrl = (string)($upload['url'] ?? media_url((string)$upload['path']));
+
+    echo json_encode([
+        'location' => $imageUrl
+    ]);
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
 | Helper
 |--------------------------------------------------------------------------
 */
@@ -2398,7 +2431,7 @@ if (
                                 ) ?></textarea>
 
                                 <div class="form-help">
-                                    Gunakan baris baru untuk memisahkan paragraf.
+                                    Gunakan toolbar editor di atas untuk memformat teks, menyisipkan tautan/link, atau upload gambar/foto langsung di antara paragraf.
                                 </div>
 
                             </div>
@@ -3427,6 +3460,138 @@ document.addEventListener(
     }
 );
 
+</script>
+
+<!-- =========================================================
+     TinyMCE Rich Text Editor (Blog / News Publisher)
+========================================================= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof tinymce !== 'undefined') {
+        tinymce.init({
+            selector: 'textarea.content-editor',
+            min_height: 480,
+            menubar: 'edit insert format table view tools',
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | link image media | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | blockquote hr | removeformat | code fullscreen',
+            content_style: 'body { font-family: Inter, Arial, sans-serif; font-size: 14px; line-height: 1.8; color: #222; padding: 16px; } img { max-width: 100%; height: auto; border-radius: 8px; margin: 12px auto; display: block; } a { color: #d90000; text-decoration: underline; font-weight: 600; } blockquote { border-left: 4px solid #d90000; padding: 12px 18px; margin: 16px 0; background: #f9fafb; color: #4b5563; font-style: italic; } figure { margin: 16px auto; text-align: center; } figcaption { font-size: 12px; color: #6b7280; font-style: italic; margin-top: 6px; }',
+            image_title: true,
+            image_caption: true,
+            image_advtab: true,
+            automatic_uploads: true,
+            file_picker_types: 'image',
+            images_upload_url: 'posts.php?action=editor_upload',
+            images_upload_handler: function (blobInfo, progress) {
+                return new Promise(function (resolve, reject) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.withCredentials = true;
+                    xhr.open('POST', 'posts.php?action=editor_upload');
+
+                    xhr.upload.onprogress = function (e) {
+                        if (e.lengthComputable) {
+                            progress(e.loaded / e.total * 100);
+                        }
+                    };
+
+                    xhr.onload = function () {
+                        if (xhr.status < 200 || xhr.status >= 300) {
+                            reject('HTTP Error: ' + xhr.status);
+                            return;
+                        }
+
+                        let json;
+                        try {
+                            json = JSON.parse(xhr.responseText);
+                        } catch (err) {
+                            reject('Respon server tidak valid: ' + xhr.responseText);
+                            return;
+                        }
+
+                        if (!json || typeof json.location !== 'string') {
+                            reject(json && json.error ? json.error : 'Format upload tidak sesuai.');
+                            return;
+                        }
+
+                        resolve(json.location);
+                    };
+
+                    xhr.onerror = function () {
+                        reject('Gagal mengupload gambar ke server.');
+                    };
+
+                    const formData = new FormData();
+                    formData.append('file', blobInfo.blob(), blobInfo.filename());
+                    const csrfInput = document.querySelector('input[name="csrf_token"]');
+                    if (csrfInput) {
+                        formData.append('csrf_token', csrfInput.value);
+                    }
+
+                    xhr.send(formData);
+                });
+            },
+            file_picker_callback: function (callback, value, meta) {
+                if (meta.filetype === 'image') {
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/jpeg,image/png,image/webp,image/gif');
+
+                    input.onchange = function () {
+                        const file = this.files[0];
+                        if (!file) return;
+
+                        const formData = new FormData();
+                        formData.append('file', file, file.name);
+                        const csrfInput = document.querySelector('input[name="csrf_token"]');
+                        if (csrfInput) {
+                            formData.append('csrf_token', csrfInput.value);
+                        }
+
+                        const xhr = new XMLHttpRequest();
+                        xhr.withCredentials = true;
+                        xhr.open('POST', 'posts.php?action=editor_upload');
+
+                        xhr.onload = function () {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                try {
+                                    const res = JSON.parse(xhr.responseText);
+                                    if (res && res.location) {
+                                        callback(res.location, { alt: file.name, title: file.name });
+                                        return;
+                                    }
+                                } catch (e) {}
+                            }
+                            alert('Gagal mengupload gambar. Silakan coba lagi.');
+                        };
+
+                        xhr.send(formData);
+                    };
+
+                    input.click();
+                }
+            },
+            setup: function (editor) {
+                editor.on('change keyup', function () {
+                    editor.save();
+                });
+            }
+        });
+
+        // Sinkronisasi data editor ke textarea saat form disubmit
+        const postForm = document.querySelector('form#post-form') || document.querySelector('form');
+        if (postForm) {
+            postForm.addEventListener('submit', function () {
+                if (typeof tinymce !== 'undefined') {
+                    tinymce.triggerSave();
+                }
+            });
+        }
+    }
+});
 </script>
 
 </body>

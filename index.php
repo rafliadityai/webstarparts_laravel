@@ -577,8 +577,8 @@ require_once __DIR__ . '/includes/navbar.php';
 
         <div
             class="swiper hero-slider hero-swiper fdr-promo-slider"
-            data-autoplay-delay="2000"
-            data-autoplay-direction="reverse"
+            data-autoplay-delay="4000"
+            data-autoplay-direction="forward"
             data-initial-slide="<?= max(0, count($fdrPromoSlidesForRender) - 1); ?>"
             aria-label="Promosi produk ban FDR"
         >
@@ -2326,10 +2326,14 @@ if (false && !empty($displayCategories)): ?>
                     $brandLogo = 'uploads/general/logo-osram.webp';
                 } elseif (str_contains($brandNameKey, 'FDR')) {
                     $brandLogo = 'uploads/general/fdr-tire-logo-red.webp';
+                } elseif (str_contains($brandNameKey, 'HQFEDERAL')) {
+                     $brandLogo = 'uploads/general/logo-hqfederal.png';
+                } elseif (str_contains($brandNameKey, 'ROTARY')) {
+                     $brandLogo = 'uploads/general/logo-rotary.png';
                 } elseif (str_contains($brandNameKey, 'TAYORI')) {
                     $brandWordmarkClass = 'brand-wordmark-tayori';
                 } elseif (str_contains($brandNameKey, 'RAKUDA')) {
-                    $brandWordmarkClass = 'brand-wordmark-rakuda';
+                    $brandWordmarkClass = 'brand-wordmark-rakuda';                
                 }
 
                 ?>
@@ -2397,35 +2401,29 @@ if (false && !empty($displayCategories)): ?>
 ======================================================== -->
 
 <section
-    class="section section-dark"
+    class="section section-dark distribution-section"
 >
 
     <div class="container">
 
         <div
-            class="about-grid"
-            style="
-                grid-template-columns:
-                    .85fr
-                    1.15fr;
-            "
+            class="distribution-grid"
         >
 
             <div
+                class="distribution-content"
                 data-aos="fade-right"
             >
 
                 <div
-                    class="section-kicker"
-                    style="color:#ff3b3b;"
+                    class="section-kicker distribution-kicker"
                 >
                     JARINGAN & DISTRIBUSI
                 </div>
 
 
                 <h2
-                    class="section-title"
-                    style="color:#fff;"
+                    class="section-title distribution-title"
                 >
 
                     Melayani Kebutuhan
@@ -2437,11 +2435,7 @@ if (false && !empty($displayCategories)): ?>
 
 
                 <p
-                    class="section-description"
-                    style="
-                        margin-left:0;
-                        color:rgba(255,255,255,.62);
-                    "
+                    class="section-description distribution-description"
                 >
 
                     Star Parts Motor membangun jaringan
@@ -2452,33 +2446,15 @@ if (false && !empty($displayCategories)): ?>
 
 
                 <div
-                    style="
-                        margin-top:27px;
-                        display:flex;
-                        flex-direction:column;
-                        gap:12px;
-                    "
+                    class="distribution-features-list"
                 >
 
                     <div
-                        style="
-                            display:flex;
-                            gap:12px;
-                            align-items:flex-start;
-                        "
+                        class="distribution-feature-row"
                     >
 
                         <div
-                            style="
-                                flex:0 0 auto;
-                                width:40px;
-                                height:40px;
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
-                                background:var(--spm-red);
-                                border-radius:10px;
-                            "
+                            class="distribution-feature-icon"
                         >
 
                             <i
@@ -2487,27 +2463,13 @@ if (false && !empty($displayCategories)): ?>
 
                         </div>
 
-                        <div>
+                        <div class="distribution-feature-text">
 
-                            <strong
-                                style="
-                                    display:block;
-                                    color:white;
-                                    font-family:var(--spm-font);
-                                    font-size:12px;
-                                "
-                            >
+                            <strong>
                                 Lokasi
                             </strong>
 
-                            <span
-                                style="
-                                    display:block;
-                                    margin-top:2px;
-                                    color:rgba(255,255,255,.58);
-                                    font-size:11px;
-                                "
-                            >
+                            <span>
 
                                 <?= e(
                                     $address !== ''
@@ -2523,24 +2485,11 @@ if (false && !empty($displayCategories)): ?>
 
 
                     <div
-                        style="
-                            display:flex;
-                            gap:12px;
-                            align-items:flex-start;
-                        "
+                        class="distribution-feature-row"
                     >
 
                         <div
-                            style="
-                                flex:0 0 auto;
-                                width:40px;
-                                height:40px;
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
-                                background:var(--spm-red);
-                                border-radius:10px;
-                            "
+                            class="distribution-feature-icon"
                         >
 
                             <i
@@ -2549,27 +2498,13 @@ if (false && !empty($displayCategories)): ?>
 
                         </div>
 
-                        <div>
+                        <div class="distribution-feature-text">
 
-                            <strong
-                                style="
-                                    display:block;
-                                    color:white;
-                                    font-family:var(--spm-font);
-                                    font-size:12px;
-                                "
-                            >
+                            <strong>
                                 Distribusi
                             </strong>
 
-                            <span
-                                style="
-                                    display:block;
-                                    margin-top:2px;
-                                    color:rgba(255,255,255,.58);
-                                    font-size:11px;
-                                "
-                            >
+                            <span>
                                 Mendukung kebutuhan partner bisnis otomotif.
                             </span>
 
@@ -2581,7 +2516,7 @@ if (false && !empty($displayCategories)): ?>
 
 
                 <div
-                    style="margin-top:30px;"
+                    class="distribution-cta"
                 >
 
                     <a
@@ -2607,6 +2542,7 @@ if (false && !empty($displayCategories)): ?>
 
 
             <div
+                class="distribution-visual"
                 data-aos="fade-left"
             >
 
@@ -2663,33 +2599,11 @@ if (false && !empty($displayCategories)): ?>
 
 
                     <div
-                        style="
-                            min-height:420px;
-                            display:flex;
-                            flex-direction:column;
-                            align-items:center;
-                            justify-content:center;
-                            padding:35px;
-                            text-align:center;
-                            background:#1c1c1c;
-                            border:1px solid rgba(255,255,255,.08);
-                            border-radius:20px;
-                        "
+                        class="distribution-card"
                     >
 
                         <div
-                            style="
-                                width:68px;
-                                height:68px;
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
-                                margin-bottom:18px;
-                                color:white;
-                                background:var(--spm-red);
-                                border-radius:18px;
-                                font-size:25px;
-                            "
+                            class="distribution-card-icon"
                         >
 
                             <i
@@ -2700,13 +2614,7 @@ if (false && !empty($displayCategories)): ?>
 
 
                         <h3
-                            style="
-                                margin-bottom:8px;
-                                color:white;
-                                font-family:var(--spm-font);
-                                font-size:22px;
-                                font-weight:800;
-                            "
+                            class="distribution-card-title"
                         >
 
                             <?= e(
@@ -2718,12 +2626,7 @@ if (false && !empty($displayCategories)): ?>
 
 
                         <p
-                            style="
-                                max-width:480px;
-                                margin:0;
-                                color:rgba(255,255,255,.58);
-                                font-size:12px;
-                            "
+                            class="distribution-card-address"
                         >
 
                             <?= e(
@@ -2743,8 +2646,7 @@ if (false && !empty($displayCategories)): ?>
                                 ); ?>"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="btn btn-primary"
-                                style="margin-top:22px;"
+                                class="btn btn-primary distribution-card-btn"
                             >
 
                                 Buka Google Maps
@@ -2762,75 +2664,33 @@ if (false && !empty($displayCategories)): ?>
                 <?php else: ?>
 
                     <div
-                        style="
-                            min-height:420px;
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            padding:35px;
-                            text-align:center;
-                            background:
-                                radial-gradient(
-                                    circle at center,
-                                    rgba(217,0,0,.18),
-                                    transparent 45%
-                                ),
-                                #1b1b1b;
-                            border:1px solid rgba(255,255,255,.08);
-                            border-radius:20px;
-                        "
+                        class="distribution-card distribution-card-fallback"
                     >
 
-                        <div>
+                        <div
+                            class="distribution-card-icon"
+                        >
 
-                            <div
-                                style="
-                                    width:68px;
-                                    height:68px;
-                                    display:flex;
-                                    align-items:center;
-                                    justify-content:center;
-                                    margin:0 auto 18px;
-                                    color:white;
-                                    background:var(--spm-red);
-                                    border-radius:18px;
-                                    font-size:25px;
-                                "
-                            >
-
-                                <i
-                                    class="fa-solid fa-map-location-dot"
-                                ></i>
-
-                            </div>
-
-
-                            <h3
-                                style="
-                                    color:white;
-                                    font-family:var(--spm-font);
-                                    font-size:22px;
-                                    font-weight:800;
-                                    margin-bottom:8px;
-                                "
-                            >
-                                Area Distribusi
-                            </h3>
-
-
-                            <p
-                                style="
-                                    max-width:430px;
-                                    margin:0 auto;
-                                    color:rgba(255,255,255,.56);
-                                    font-size:12px;
-                                "
-                            >
-                                Informasi jaringan dan lokasi distribusi
-                                dapat dikelola melalui panel admin.
-                            </p>
+                            <i
+                                class="fa-solid fa-map-location-dot"
+                            ></i>
 
                         </div>
+
+
+                        <h3
+                            class="distribution-card-title"
+                        >
+                            Area Distribusi
+                        </h3>
+
+
+                        <p
+                            class="distribution-card-address"
+                        >
+                            Informasi jaringan dan lokasi distribusi
+                            dapat dikelola melalui panel admin.
+                        </p>
 
                     </div>
 

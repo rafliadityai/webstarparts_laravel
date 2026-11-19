@@ -59,7 +59,7 @@ define('APP_ENV', strtolower($starpartsConfiguredEnvironment));
 */
 
 define('DB_HOST', (string) $starpartsConfigValue('STARPARTS_DB_HOST', 'db_host', '127.0.0.1'));
-define('DB_NAME', (string) $starpartsConfigValue('STARPARTS_DB_NAME', 'db_name', 'starparts_db'));
+define('DB_NAME', (string) $starpartsConfigValue('STARPARTS_DB_NAME', 'db_name', 'spm'));
 define('DB_USER', (string) $starpartsConfigValue('STARPARTS_DB_USER', 'db_user', 'root'));
 define('DB_PASS', (string) $starpartsConfigValue('STARPARTS_DB_PASS', 'db_pass', ''));
 

@@ -1567,7 +1567,7 @@ require_once __DIR__ . '/includes/navbar.php';
             <div class="container">
 
                 <div
-                    class="about-grid"
+                    class="about-grid distribution-grid"
                 >
 
                     <div
