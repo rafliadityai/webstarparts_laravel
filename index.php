@@ -570,47 +570,16 @@ require_once __DIR__ . '/includes/navbar.php';
 
 <section
     id="home"
-    class="hero<?= !empty($fdrPromoSlides) ? ' fdr-promo-hero' : ''; ?>"
+    class="hero<?= empty($banners) && !empty($fdrPromoSlides) ? ' fdr-promo-hero' : ''; ?>"
 >
 
-    <?php if (!empty($fdrPromoSlides)): ?>
-
-        <div
-            class="swiper hero-slider hero-swiper fdr-promo-slider"
-            data-autoplay-delay="4000"
-            data-autoplay-direction="forward"
-            data-initial-slide="<?= max(0, count($fdrPromoSlidesForRender) - 1); ?>"
-            aria-label="Promosi produk ban FDR"
-        >
-            <div class="swiper-wrapper">
-                <?php foreach ($fdrPromoSlidesForRender as $index => $slide): ?>
-                    <div class="swiper-slide">
-                        <a
-                            class="fdr-promo-slide-link"
-                            href="<?= e(product_url((string)$slide['slug'])); ?>"
-                            aria-label="Read More: <?= e((string)$slide['name']); ?>"
-                            title="Read More: <?= e((string)$slide['name']); ?>"
-                        >
-                            <img
-                                src="<?= e(media_url((string)$slide['image'])); ?>"
-                                alt="Promosi ban FDR <?= e((string)$slide['name']); ?>"
-                                <?= $index === (count($fdrPromoSlidesForRender) - 1) ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"'; ?>
-                                decoding="async"
-                            >
-                        </a>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="swiper-button-prev" aria-label="Slide sebelumnya"></div>
-            <div class="swiper-button-next" aria-label="Slide berikutnya"></div>
-            <div class="swiper-pagination"></div>
-        </div>
-
-    <?php elseif (!empty($banners)): ?>
+    <?php if (!empty($banners)): ?>
 
         <div
             class="swiper hero-slider hero-swiper"
+            data-autoplay-delay="4500"
+            data-autoplay-direction="forward"
+            aria-label="Banner Utama PT Star Parts Motor"
         >
 
             <div class="swiper-wrapper">
@@ -747,172 +716,90 @@ require_once __DIR__ . '/includes/navbar.php';
                         </div>
 
 
-                        <div
-                            class="hero-container container"
-                        >
-
+                        <?php if ($bannerTitle !== '' || $bannerSubtitle !== '' || $bannerButtonText !== ''): ?>
                             <div
-                                class="hero-content"
+                                class="hero-container container"
                             >
 
-<?php $heroHeadingTag = ($index === 0) ? 'h1' : 'h2'; ?>
-                                <<?= $heroHeadingTag; ?>
-                                    class="hero-title"
-                                    data-aos="fade-up"
-                                    data-aos-delay="100"
-                                >
-                                    <?= nl2br(e(
-                                        $bannerTitle !== '' ? $bannerTitle : $heroTitle
-                                    )); ?>
-                                </<?= $heroHeadingTag; ?>>
-
-
-                                <?php if (
-                                    $bannerSubtitle !== ''
-                                ): ?>
-
-                                    <p
-                                        class="hero-description"
-                                        data-aos="fade-up"
-                                        data-aos-delay="200"
-                                    >
-
-                                        <?= nl2br(
-                                            e(
-                                                $bannerSubtitle
-                                            )
-                                        ); ?>
-
-                                    </p>
-
-                                <?php elseif (
-                                    $heroSubtitle !== ''
-                                ): ?>
-
-                                    <p
-                                        class="hero-description"
-                                    >
-
-                                        <?= nl2br(
-                                            e(
-                                                $heroSubtitle
-                                            )
-                                        ); ?>
-
-                                    </p>
-
-                                <?php endif; ?>
-
-
                                 <div
-                                    class="hero-actions"
-                                    data-aos="fade-up"
-                                    data-aos-delay="300"
+                                    class="hero-content"
                                 >
 
-                                    <?php if (
-                                        $bannerButtonText !== ''
-                                        &&
-                                        $bannerButtonUrl !== ''
-                                    ): ?>
-
-                                        <a
-                                            href="<?= e(
-                                                base_url(
-                                                    ltrim(
-                                                        $bannerButtonUrl,
-                                                        '/'
-                                                    )
-                                                )
-                                            ); ?>"
-                                            class="btn btn-primary"
+<?php $heroHeadingTag = ($index === 0) ? 'h1' : 'h2'; ?>
+                                    <?php if ($bannerTitle !== ''): ?>
+                                        <<?= $heroHeadingTag; ?>
+                                            class="hero-title"
+                                            data-aos="fade-up"
+                                            data-aos-delay="100"
                                         >
-
-                                            <?= e(
-                                                $bannerButtonText
-                                            ); ?>
-
-                                            <i
-                                                class="fa-solid fa-arrow-right"
-                                                aria-hidden="true"
-                                            ></i>
-
-                                        </a>
-
-                                    <?php else: ?>
-
-                                        <a
-                                            href="<?= e(
-                                                base_url(
-                                                    'products.php'
-                                                )
-                                            ); ?>"
-                                            class="btn btn-primary"
-                                        >
-
-                                            <?= e(
-                                                $heroButtonText
-                                            ); ?>
-
-                                            <i
-                                                class="fa-solid fa-arrow-right"
-                                                aria-hidden="true"
-                                            ></i>
-
-                                        </a>
-
+                                            <?= nl2br(e($bannerTitle)); ?>
+                                        </<?= $heroHeadingTag; ?>>
                                     <?php endif; ?>
 
 
                                     <?php if (
-                                        $whatsappNumber !== ''
+                                        $bannerSubtitle !== ''
                                     ): ?>
 
-                                        <a
-                                            href="<?= e(
-                                                $whatsappLink
-                                            ); ?>"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="btn btn-white"
+                                        <p
+                                            class="hero-description"
+                                            data-aos="fade-up"
+                                            data-aos-delay="200"
                                         >
 
-                                            <i
-                                                class="fa-brands fa-whatsapp"
-                                                aria-hidden="true"
-                                            ></i>
-
-                                            Konsultasi
-
-                                        </a>
-
-                                    <?php else: ?>
-
-                                        <a
-                                            href="<?= e(
-                                                base_url(
-                                                    'contact.php'
+                                            <?= nl2br(
+                                                e(
+                                                    $bannerSubtitle
                                                 )
-                                            ); ?>"
-                                            class="btn btn-white"
-                                        >
+                                            ); ?>
 
-                                            Hubungi Kami
-
-                                            <i
-                                                class="fa-solid fa-arrow-right"
-                                                aria-hidden="true"
-                                            ></i>
-
-                                        </a>
+                                        </p>
 
                                     <?php endif; ?>
+
+
+                                    <div
+                                        class="hero-actions"
+                                        data-aos="fade-up"
+                                        data-aos-delay="300"
+                                    >
+
+                                        <?php
+                                        $bannerFinalUrl = '';
+                                        $bannerIsExternal = false;
+                                        if ($bannerButtonUrl !== '') {
+                                            $bannerIsExternal = (bool) preg_match('~^https?://~i', $bannerButtonUrl);
+                                            $bannerFinalUrl = $bannerIsExternal ? $bannerButtonUrl : base_url(ltrim($bannerButtonUrl, '/'));
+                                        } elseif ($bannerButtonText !== '') {
+                                            $bannerFinalUrl = base_url('products.php');
+                                        }
+                                        ?>
+
+                                        <?php if ($bannerButtonText !== ''): ?>
+
+                                            <a
+                                                href="<?= e($bannerFinalUrl !== '' ? $bannerFinalUrl : base_url('products.php')); ?>"
+                                                class="btn btn-primary hero-btn-custom"
+                                                <?= $bannerIsExternal ? 'target="_blank" rel="noopener noreferrer"' : ''; ?>
+                                            >
+
+                                                <?= e($bannerButtonText); ?>
+
+                                                <i
+                                                    class="fa-solid fa-arrow-right"
+                                                    aria-hidden="true"
+                                                ></i>
+
+                                            </a>
+
+                                        <?php endif; ?>
+
+                                    </div>
 
                                 </div>
 
                             </div>
-
-                        </div>
+                        <?php endif; ?>
 
 
                         <div
@@ -941,6 +828,83 @@ require_once __DIR__ . '/includes/navbar.php';
                 class="swiper-pagination"
             ></div>
 
+        </div>
+
+    <?php elseif (!empty($fdrPromoSlides)): ?>
+
+        <div
+            class="swiper hero-slider hero-swiper fdr-promo-slider"
+            data-autoplay-delay="4000"
+            data-autoplay-direction="forward"
+            data-initial-slide="<?= max(0, count($fdrPromoSlidesForRender) - 1); ?>"
+            aria-label="Promosi produk ban FDR"
+        >
+            <div class="swiper-wrapper">
+                <?php foreach ($fdrPromoSlidesForRender as $index => $slide): ?>
+                  <div class="swiper-slide">
+    <div class="hero-container container hero-split-grid">
+
+        <!-- KIRI: TEKS & TOMBOL -->
+        <?php if ($bannerTitle !== '' || $bannerSubtitle !== '' || $bannerButtonText !== ''): ?>
+            <div class="hero-content">
+                <?php $heroHeadingTag = ($index === 0) ? 'h1' : 'h2'; ?>
+                <?php if ($bannerTitle !== ''): ?>
+                    <<?= $heroHeadingTag; ?> class="hero-title" data-aos="fade-up" data-aos-delay="100">
+                        <?= nl2br(e($bannerTitle)); ?>
+                    </<?= $heroHeadingTag; ?>>
+                <?php endif; ?>
+
+                <?php if ($bannerSubtitle !== ''): ?>
+                    <p class="hero-description" data-aos="fade-up" data-aos-delay="200">
+                        <?= nl2br(e($bannerSubtitle)); ?>
+                    </p>
+                <?php endif; ?>
+
+                <?php
+                $bannerFinalUrl = '';
+                $bannerIsExternal = false;
+                if ($bannerButtonUrl !== '') {
+                    $bannerIsExternal = (bool) preg_match('~^https?://~i', $bannerButtonUrl);
+                    $bannerFinalUrl = $bannerIsExternal ? $bannerButtonUrl : base_url(ltrim($bannerButtonUrl, '/'));
+                } elseif ($bannerButtonText !== '') {
+                    $bannerFinalUrl = base_url('products.php');
+                }
+                ?>
+
+                <?php if ($bannerButtonText !== ''): ?>
+                    <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
+                        <a
+                            href="<?= e($bannerFinalUrl !== '' ? $bannerFinalUrl : base_url('products.php')); ?>"
+                            class="btn btn-primary hero-btn-custom"
+                            <?= $bannerIsExternal ? 'target="_blank" rel="noopener noreferrer"' : ''; ?>
+                        >
+                            <?= e($bannerButtonText); ?>
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- KANAN: GAMBAR BANNER UTUH (RASIO 2:1) -->
+        <div class="hero-media<?= e($bannerFitClass); ?>">
+            <?php if ($bannerVideoUrl !== ''): ?>
+                <video autoplay muted loop playsinline preload="<?= $index === 0 ? 'auto' : 'metadata'; ?>">
+                    <source src="<?= e($bannerVideoUrl); ?>" type="video/mp4">
+                </video>
+            <?php elseif ($bannerImageUrl !== ''): ?>
+                <img src="<?= e($bannerImageUrl); ?>" <?= media_image_attrs($bannerImage, trim((string)($banner['image_alt'] ?? '')) !== '' ? trim((string)$banner['image_alt']) : ($bannerTitle ?: $siteName), null, $index > 0 ? 'lazy' : 'eager', $index === 0, '(max-width: 900px) 100vw, 58vw'); ?>>
+            <?php endif; ?>
+        </div>
+
+    </div>
+</div>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="swiper-button-prev" aria-label="Slide sebelumnya"></div>
+            <div class="swiper-button-next" aria-label="Slide berikutnya"></div>
+            <div class="swiper-pagination"></div>
         </div>
 
     <?php else: ?>
