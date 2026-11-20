@@ -155,7 +155,7 @@ if (
 ) {
 
     $navWhatsappMessage =
-        'Halo Star Parts Motor, saya ingin mendapatkan informasi mengenai produk dan kerja sama.';
+        get_whatsapp_message();
 
 
     $navWhatsappLink =

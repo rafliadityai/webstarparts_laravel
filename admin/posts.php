@@ -9,6 +9,20 @@ require_admin();
 $pageTitle = 'Berita / Artikel';
 $admin     = current_admin();
 
+try {
+    $postColumns = $pdo->query("SHOW COLUMNS FROM posts")->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('video_url', $postColumns, true)) {
+        $pdo->exec("ALTER TABLE posts ADD COLUMN video_url VARCHAR(500) NULL AFTER featured_image");
+        $postColumns[] = 'video_url';
+    }
+    if (!in_array('is_featured', $postColumns, true)) {
+        $pdo->exec("ALTER TABLE posts ADD COLUMN is_featured TINYINT(1) NOT NULL DEFAULT 0");
+    }
+} catch (Throwable $e) {
+    error_log('Post media/schema setup failed: ' . $e->getMessage());
+    set_flash('error', 'Persiapan database berita gagal. Periksa izin ALTER TABLE atau jalankan migrasi database.');
+}
+
 $uploadDir = __DIR__ . '/../uploads/posts';
 
 if (!is_dir($uploadDir)) {
@@ -25,7 +39,7 @@ if (!is_dir($uploadDir)) {
 if (isset($_GET['action']) && $_GET['action'] === 'editor_upload') {
     header('Content-Type: application/json; charset=utf-8');
 
-    if (!is_post() || empty($_FILES['file'])) {
+    if (!is_post() || empty($_FILES['file']) || !verify_csrf()) {
         http_response_code(400);
         echo json_encode(['error' => 'Tidak ada file gambar yang diunggah.']);
         exit;
@@ -176,6 +190,11 @@ if (is_post()) {
         $metaDescription = trim(post_string('meta_description'));
         $featuredImageAlt = trim(post_string('featured_image_alt'));
         $authorName   = trim(post_string('author_name'));
+        $videoUrl = trim(post_string('video_url'));
+        if ($videoUrl !== '' && !filter_var($videoUrl, FILTER_VALIDATE_URL)) {
+            set_flash('error', 'Link video harus berupa URL YouTube, Instagram, Vimeo, atau video yang valid.');
+            redirect(BASE_URL . '/admin/posts.php' . ($id ? '?edit=' . $id : '') . '#post-form');
+        }
 
         $status = post_string('status');
 
@@ -345,15 +364,7 @@ if (is_post()) {
 
             $upload = upload_image(
                 $_FILES['image'],
-                $uploadDir,
-                [
-                    'jpg',
-                    'jpeg',
-                    'png',
-                    'webp',
-                    'gif'
-                ],
-                5 * 1024 * 1024
+                'posts'
             );
 
             if (
@@ -397,12 +408,14 @@ if (is_post()) {
                         excerpt = ?,
                         content = ?,
                         featured_image = ?,
+                        video_url = ?,
                         author = ?,
                         status = ?,
                         published_at = ?,
                         meta_title = ?,
                         meta_description = ?,
                         featured_image_alt = ?,
+                        is_featured = ?,
                         updated_at = NOW()
                     WHERE id = ?
                 ");
@@ -415,6 +428,7 @@ if (is_post()) {
                         : null,
                     $content,
                     $image,
+                    $videoUrl,
                     $authorName !== ''
                         ? $authorName
                         : null,
@@ -423,6 +437,7 @@ if (is_post()) {
                     $metaTitle !== '' ? $metaTitle : null,
                     $metaDescription !== '' ? $metaDescription : null,
                     $featuredImageAlt !== '' ? $featuredImageAlt : null,
+                    $isFeatured,
                     $id
                 ]);
 
@@ -463,6 +478,7 @@ if (is_post()) {
                         excerpt,
                         content,
                         featured_image,
+                        video_url,
                         author,
                         status,
                         published_at,
@@ -470,12 +486,13 @@ if (is_post()) {
                         meta_title,
                         meta_description,
                         featured_image_alt,
+                        is_featured,
                         created_at,
                         updated_at
                     )
                     VALUES
                     (
-                        ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, NOW(), NOW()
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, NOW(), NOW()
                     )
                 ");
 
@@ -487,6 +504,7 @@ if (is_post()) {
                         : null,
                     $content,
                     $image,
+                    $videoUrl,
                     $authorName !== ''
                         ? $authorName
                         : null,
@@ -494,7 +512,8 @@ if (is_post()) {
                     $publishedAt,
                     $metaTitle !== '' ? $metaTitle : null,
                     $metaDescription !== '' ? $metaDescription : null,
-                    $featuredImageAlt !== '' ? $featuredImageAlt : null
+                    $featuredImageAlt !== '' ? $featuredImageAlt : null,
+                    $isFeatured
                 ]);
 
                 $pdo->commit();
@@ -532,6 +551,7 @@ if (is_post()) {
                 'error',
                 'Terjadi kesalahan saat menyimpan artikel.'
             );
+            error_log('Star Parts post save failed: ' . $e->getMessage());
         }
 
         redirect(
@@ -2398,6 +2418,25 @@ if (
 
                             </div>
 
+                            <!-- Media -->
+
+                            <div class="form-group col-12">
+                                <label class="form-label" for="postVideoUrl">
+                                    Link Video YouTube / Instagram / Vimeo
+                                </label>
+                                <input
+                                    type="url"
+                                    name="video_url"
+                                    id="postVideoUrl"
+                                    class="form-control"
+                                    value="<?= e($editPost['video_url'] ?? '') ?>"
+                                    placeholder="https://www.youtube.com/watch?v=... atau https://www.instagram.com/reel/.../"
+                                >
+                                <div class="form-help">
+                                    Opsional. Sistem akan menampilkan video/embed responsif di atas isi artikel.
+                                </div>
+                            </div>
+
                             <!-- SEO -->
 
                             <div class="form-group col-6">
@@ -2453,7 +2492,7 @@ if (
                                 >
 
                                 <div class="form-help">
-                                    JPG, PNG, WEBP atau GIF. Maksimal 5 MB.
+                                    JPG, PNG, WEBP atau GIF. Maksimal 10 MB.
                                 </div>
 
                                 <div class="upload-preview">
@@ -3357,7 +3396,7 @@ document.addEventListener(
                     }
 
                     const maxSize =
-                        5 *
+                        10 *
                         1024 *
                         1024;
 
@@ -3367,7 +3406,7 @@ document.addEventListener(
                     ) {
 
                         alert(
-                            'Ukuran thumbnail maksimal 5 MB.'
+                            'Ukuran thumbnail maksimal 10 MB.'
                         );
 
                         this.value = '';
@@ -3472,6 +3511,10 @@ document.addEventListener('DOMContentLoaded', function () {
         tinymce.init({
             selector: 'textarea.content-editor',
             min_height: 480,
+            document_base_url: '<?= e(base_url()); ?>',
+            relative_urls: false,
+            remove_script_host: true,
+            convert_urls: true,
             menubar: 'edit insert format table view tools',
             plugins: [
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
@@ -3485,12 +3528,12 @@ document.addEventListener('DOMContentLoaded', function () {
             image_advtab: true,
             automatic_uploads: true,
             file_picker_types: 'image',
-            images_upload_url: 'posts.php?action=editor_upload',
+            images_upload_url: '<?= e(base_url('admin/posts.php?action=editor_upload')); ?>',
             images_upload_handler: function (blobInfo, progress) {
                 return new Promise(function (resolve, reject) {
                     const xhr = new XMLHttpRequest();
                     xhr.withCredentials = true;
-                    xhr.open('POST', 'posts.php?action=editor_upload');
+                    xhr.open('POST', '<?= e(base_url('admin/posts.php?action=editor_upload')); ?>');
 
                     xhr.upload.onprogress = function (e) {
                         if (e.lengthComputable) {
@@ -3553,7 +3596,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         const xhr = new XMLHttpRequest();
                         xhr.withCredentials = true;
-                        xhr.open('POST', 'posts.php?action=editor_upload');
+                        xhr.open('POST', '<?= e(base_url('admin/posts.php?action=editor_upload')); ?>');
 
                         xhr.onload = function () {
                             if (xhr.status >= 200 && xhr.status < 300) {

@@ -133,7 +133,7 @@ if ($whatsappNumber !== '') {
         $whatsappNumber .
         '?text=' .
         rawurlencode(
-            'Halo Star Parts Motor, saya ingin mendapatkan informasi lebih lanjut.'
+            get_whatsapp_message()
         );
 }
 

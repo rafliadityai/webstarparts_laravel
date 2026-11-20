@@ -1710,7 +1710,8 @@ require __DIR__ . '/includes/navbar.php';
 
                 $whatsapp =
                     get_setting(
-                        'company_whatsapp'
+                        'whatsapp',
+                        ''
                     );
 
                 $whatsappNumber =
@@ -1731,7 +1732,7 @@ require __DIR__ . '/includes/navbar.php';
                         $whatsappNumber .
                         '?text=' .
                         rawurlencode(
-                            'Halo Star Parts Motor, saya ingin mendapatkan informasi produk.'
+                            get_whatsapp_message()
                         );
                 }
 

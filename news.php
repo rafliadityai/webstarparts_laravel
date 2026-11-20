@@ -107,7 +107,7 @@ if ($whatsappNumber !== '') {
         $whatsappNumber .
         '?text=' .
         rawurlencode(
-            'Halo Star Parts Motor, saya ingin mendapatkan informasi terbaru mengenai produk dan kerja sama.'
+            get_whatsapp_message()
         );
 }
 

@@ -221,7 +221,7 @@ if ($whatsappNumber !== '') {
         $whatsappNumber .
         '?text=' .
         rawurlencode(
-            'Halo Star Parts Motor, saya tertarik untuk mendapatkan informasi mengenai peluang karir di perusahaan.'
+            get_whatsapp_message()
         );
 }
 

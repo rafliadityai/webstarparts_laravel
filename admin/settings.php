@@ -408,6 +408,11 @@ $settingGroups = [
                 'type'  => 'text',
                 'placeholder' => '628xxxxxxxxxx'
             ],
+            'whatsapp_message' => [
+                'label' => 'Pesan Template WhatsApp',
+                'type'  => 'textarea',
+                'placeholder' => 'Halo Star Parts Motor, saya dapat nomor ini dari website dan ingin bertanya.'
+            ],
             'email' => [
                 'label' => 'Email',
                 'type'  => 'email',

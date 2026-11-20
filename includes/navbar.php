@@ -155,7 +155,7 @@ if (
 ) {
 
     $navWhatsappMessage =
-        'Halo Star Parts Motor, saya ingin mendapatkan informasi mengenai produk dan kerja sama.';
+        get_whatsapp_message();
 
 
     $navWhatsappLink =
@@ -1769,7 +1769,7 @@ $navEscape = static function (
      STICKY WHATSAPP BUTTON
 ========================================================= -->
 <a
-    href="<?= $navEscape($navWhatsappLink !== '#' ? $navWhatsappLink : 'https://wa.me/6281111288889?text=' . rawurlencode('Halo Star Parts Motor, saya ingin mendapatkan informasi mengenai produk dan kerja sama.')); ?>"
+    href="<?= $navEscape($navWhatsappLink !== '#' ? $navWhatsappLink : get_whatsapp_link()); ?>"
     target="_blank"
     rel="noopener noreferrer"
     class="sticky-wa-button"

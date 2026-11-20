@@ -284,6 +284,16 @@ $postImageColumn =
         ]
     );
 
+$postVideoUrlColumn =
+    starparts_news_detail_column(
+        $postColumnNames,
+        [
+            'video_url',
+            'video',
+            'embed_url'
+        ]
+    );
+
 $postAuthorColumn =
     starparts_news_detail_column(
         $postColumnNames,
@@ -424,6 +434,16 @@ if (
 
             $selectParts[] =
                 "'' AS post_image";
+        }
+
+        if (
+            $postVideoUrlColumn !== null
+        ) {
+            $selectParts[] =
+                "`{$postVideoUrlColumn}` AS post_video_url";
+        } else {
+            $selectParts[] =
+                "'' AS post_video_url";
         }
 
 
@@ -842,6 +862,14 @@ $postImage =
         )
     );
 
+$postVideoUrl =
+    trim(
+        (string) (
+            $post['post_video_url']
+            ?? ''
+        )
+    );
+
 $postAuthor =
     trim(
         (string) (
@@ -1057,6 +1085,95 @@ $bodyClass =
 |--------------------------------------------------------------------------
 */
 
+function starparts_post_video_embed(string $url): string
+{
+    $url = trim($url);
+    if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
+        return '';
+    }
+
+    $parts = parse_url($url);
+    $host = strtolower((string) ($parts['host'] ?? ''));
+    $host = preg_replace('/^www\./', '', $host) ?? $host;
+    $path = trim((string) ($parts['path'] ?? ''), '/');
+
+    if (in_array($host, ['youtube.com', 'm.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com'], true) ||
+        $host === 'youtu.be') {
+        $videoId = '';
+        if ($host === 'youtu.be') {
+            $videoId = explode('/', $path)[0] ?? '';
+        } else {
+            parse_str((string) ($parts['query'] ?? ''), $query);
+            $videoId = (string) ($query['v'] ?? '');
+            if ($videoId === '' && preg_match('~/(?:embed|shorts|live)/([^/?]+)~', '/' . $path, $matches)) {
+                $videoId = $matches[1];
+            }
+        }
+        if (preg_match('/^[a-zA-Z0-9_-]{6,}$/', $videoId)) {
+            return '<div class="news-video-embed"><iframe src="https://www.youtube-nocookie.com/embed/' . rawurlencode($videoId) . '" title="YouTube video player" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>';
+        }
+    }
+
+    if ($host === 'instagram.com' || $host === 'www.instagram.com') {
+        if (preg_match('~/(p|reel|tv)/([^/?]+)~', '/' . $path, $matches)) {
+            $type = rawurlencode($matches[1]);
+            $code = rawurlencode($matches[2]);
+            return '<div class="news-video-embed news-instagram-embed"><iframe src="https://www.instagram.com/' . $type . '/' . $code . '/embed/" title="Instagram post" loading="lazy" allowfullscreen></iframe></div>';
+        }
+    }
+
+    if ($host === 'vimeo.com' || $host === 'www.vimeo.com' || $host === 'player.vimeo.com') {
+        if (preg_match('~(?:video/)?([0-9]+)~', $path, $matches)) {
+            return '<div class="news-video-embed"><iframe src="https://player.vimeo.com/video/' . rawurlencode($matches[1]) . '" title="Vimeo video player" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>';
+        }
+    }
+
+    return '';
+}
+
+function starparts_news_content_image_urls(string $html): string
+{
+    return (string) preg_replace_callback(
+        '~<img\b[^>]*>~i',
+        static function (array $imageMatch): string {
+            return (string) preg_replace_callback(
+                '~(\bsrc\s*=\s*)(["\'])(.*?)\2~i',
+                static function (array $srcMatch): string {
+                    $source = trim(html_entity_decode($srcMatch[3], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                    $parts = parse_url($source);
+                    if (!is_array($parts)) {
+                        return $srcMatch[0];
+                    }
+
+                    $path = str_replace('\\', '/', (string) ($parts['path'] ?? ''));
+                    if (isset($parts['host'])) {
+                        $sourceHost = strtolower((string) $parts['host']);
+                        $currentHost = strtolower((string) (parse_url(BASE_URL, PHP_URL_HOST) ?: ($_SERVER['HTTP_HOST'] ?? '')));
+                        if ($sourceHost !== $currentHost) {
+                            return $srcMatch[0];
+                        }
+                    }
+
+                    $path = preg_replace('~^(?:(?:\.\./)|(?:\./))+~', '', $path) ?? $path;
+                    $path = ltrim($path, '/');
+                    $basePath = trim((string) (parse_url(BASE_URL, PHP_URL_PATH) ?? ''), '/');
+                    if ($basePath !== '' && str_starts_with($path, $basePath . '/uploads/')) {
+                        $path = substr($path, strlen($basePath) + 1);
+                    }
+
+                    if (!str_starts_with($path, 'uploads/') || preg_match('~(?:^|/)\.\.(?:/|$)~', $path)) {
+                        return $srcMatch[0];
+                    }
+
+                    return $srcMatch[1] . $srcMatch[2] . e(media_url($path)) . $srcMatch[2];
+                },
+                $imageMatch[0]
+            );
+        },
+        $html
+    );
+}
+
 $allowedContentTags =
     '<p><br><strong><b><em><i><u><s><ul><ol><li><blockquote><h2><h3><h4><h5><h6><hr><a><span><div><img><figure><figcaption><iframe><video><audio><source><table><thead><tbody><tr><th><td>';
 
@@ -1068,6 +1185,11 @@ $renderedContent =
             $allowedContentTags
         )
         : '';
+
+$renderedContent = starparts_news_content_image_urls($renderedContent);
+
+$postVideoEmbed =
+    starparts_post_video_embed($postVideoUrl);
 
 // Jika teks artikel polos tanpa tag paragraf (misal artikel lama), otomatis konversi newlines ke <p>
 if ($renderedContent !== '' && !preg_match('/<\s*(?:p|div|h[1-6]|ul|ol|blockquote|table|figure)\b/i', $renderedContent)) {
@@ -1323,9 +1445,7 @@ if (
     $whatsappNumber !== ''
 ) {
 
-    $shareMessage =
-        "Halo Star Parts Motor, saya ingin mendapatkan informasi mengenai berita: " .
-        $postTitle;
+    $shareMessage = get_whatsapp_message();
 
     $shareWhatsAppLink =
         'https://wa.me/' .
@@ -1586,6 +1706,14 @@ require_once __DIR__ . '/includes/navbar.php';
 
                 <?php endif; ?>
 
+                <?php if ($postVideoEmbed !== ''): ?>
+                    <div
+                        class="news-video-wrap"
+                        data-aos="fade-up"
+                    >
+                        <?= $postVideoEmbed; ?>
+                    </div>
+                <?php endif; ?>
 
                 <!-- ARTICLE BODY -->
 

@@ -37,6 +37,58 @@ if (!function_exists('e')) {
 
 /*
 |--------------------------------------------------------------------------
+| CONTACT SETTINGS HELPERS
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('normalize_indonesian_phone')) {
+    function normalize_indonesian_phone(mixed $value, bool $whatsapp = false): string
+    {
+        $number = preg_replace('/[^0-9]/', '', (string) $value) ?? '';
+
+        if ($whatsapp && str_starts_with($number, '0')) {
+            $number = '62' . substr($number, 1);
+        }
+
+        return $number;
+    }
+}
+
+if (!function_exists('get_whatsapp_message')) {
+    function get_whatsapp_message(): string
+    {
+        $message = trim((string) get_setting(
+            'whatsapp_message',
+            'Halo Star Parts Motor, saya dapat nomor ini dari website dan ingin bertanya.'
+        ));
+
+        return $message !== ''
+            ? $message
+            : 'Halo Star Parts Motor, saya dapat nomor ini dari website dan ingin bertanya.';
+    }
+}
+
+if (!function_exists('get_whatsapp_link')) {
+    function get_whatsapp_link(?string $message = null): string
+    {
+        $number = normalize_indonesian_phone(
+            get_setting('whatsapp', ''),
+            true
+        );
+
+        if ($number === '') {
+            return '#';
+        }
+
+        return 'https://wa.me/' . $number . '?text=' . rawurlencode(
+            $message ?? get_whatsapp_message()
+        );
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
 | BASE URL
 |--------------------------------------------------------------------------
 */
@@ -1775,7 +1827,7 @@ if (!function_exists('upload_image')) {
         }
 
         $maxSize =
-            5 * 1024 * 1024;
+            10 * 1024 * 1024;
 
         if (
             (int) $file['size']
