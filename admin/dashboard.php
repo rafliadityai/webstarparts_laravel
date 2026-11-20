@@ -3304,6 +3304,8 @@ if (
 
 
 <body>
+<?php render_admin_sidebar_assets(); ?>
+<?php render_admin_sidebar('dashboard.php'); ?>
 
 
 <div

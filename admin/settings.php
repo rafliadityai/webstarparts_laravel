@@ -1478,6 +1478,8 @@ $flash = get_flash();
 </head>
 
 <body>
+<?php render_admin_sidebar_assets(); ?>
+<?php render_admin_sidebar('settings.php'); ?>
 
 <div class="admin-layout">
 
@@ -1605,6 +1607,21 @@ $flash = get_flash();
             >
                 <i class="fa-solid fa-sliders"></i>
                 <span>Pengaturan</span>
+            </a>
+
+            <a href="<?= e(BASE_URL) ?>/admin/careers.php">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Lowongan Karir</span>
+            </a>
+
+            <a href="<?= e(BASE_URL) ?>/admin/menus.php">
+                <i class="fa-solid fa-bars"></i>
+                <span>Menu Website</span>
+            </a>
+
+            <a href="<?= e(BASE_URL) ?>/admin/security.php">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Security</span>
             </a>
 
             <div class="admin-nav-label">

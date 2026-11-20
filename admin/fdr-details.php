@@ -139,6 +139,8 @@ body{margin:0;background:var(--admin-bg);color:var(--admin-ink);font-family:Inte
 </style>
 </head>
 <body>
+<?php render_admin_sidebar_assets(); ?>
+<?php render_admin_sidebar('fdr-details.php'); ?>
 <header class="fdr-admin-top"><div><strong>STAR PARTS MOTOR · ADMIN</strong><span>Konten produk FDR · login sebagai <?= e($adminName); ?></span></div><nav class="fdr-admin-links"><a href="<?= e(base_url('admin/products.php')); ?>"><i class="fa-solid fa-box-open"></i> Manajemen Produk</a><a href="<?= e(base_url('admin/dashboard.php')); ?>"><i class="fa-solid fa-gauge-high"></i> Dashboard</a><a href="<?= e(base_url('index.php')); ?>" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Website</a></nav></header>
 <main class="fdr-admin-main">
 <h1 class="fdr-admin-title">Konten Detail Ban FDR</h1>

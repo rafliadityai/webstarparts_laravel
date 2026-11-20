@@ -2328,6 +2328,8 @@ function spm_messages_excerpt(
 </head>
 
 <body>
+<?php render_admin_sidebar_assets(); ?>
+<?php render_admin_sidebar('messages.php'); ?>
 
 
 <div class="admin-shell">

@@ -632,6 +632,8 @@ function content_admin_active(string $name, string $section): string
     </style>
 </head>
 <body>
+<?php render_admin_sidebar_assets(); ?>
+<?php render_admin_sidebar('content.php'); ?>
 <div class="admin-app">
     <aside class="sidebar">
         <div class="brand">
@@ -655,7 +657,11 @@ function content_admin_active(string $name, string $section): string
             <a href="<?= e($baseAdmin); ?>locations.php"><i class="fa-solid fa-map-location-dot"></i><span>Lokasi</span></a>
             <a href="<?= e($baseAdmin); ?>messages.php"><i class="fa-solid fa-envelope"></i><span>Pesan</span></a>
             <a href="<?= e($baseAdmin); ?>pages.php"><i class="fa-solid fa-file-lines"></i><span>Halaman CMS</span></a>
+            <a href="<?= e($baseAdmin); ?>careers.php"><i class="fa-solid fa-briefcase"></i><span>Lowongan Karir</span></a>
+            <a href="<?= e($baseAdmin); ?>menus.php"><i class="fa-solid fa-bars"></i><span>Menu Website</span></a>
             <a href="<?= e($baseAdmin); ?>settings.php"><i class="fa-solid fa-gear"></i><span>Pengaturan</span></a>
+            <a href="<?= e($baseAdmin); ?>security.php"><i class="fa-solid fa-shield-halved"></i><span>Security</span></a>
+            <a href="<?= e($baseAdmin); ?>testimonials.php"><i class="fa-solid fa-comment-dots"></i><span>Testimoni</span></a>
             <a href="<?= e($baseAdmin); ?>logout.php"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
         </nav>
     </aside>

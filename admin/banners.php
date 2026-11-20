@@ -2682,6 +2682,8 @@ $formVideoUrl =
 
 
 <body>
+<?php render_admin_sidebar_assets(); ?>
+<?php render_admin_sidebar('banners.php'); ?>
 
 
 <div
@@ -2982,6 +2984,21 @@ $formVideoUrl =
 
                     Pengaturan
 
+                </a>
+
+                <a href="<?= e(base_url('admin/careers.php')); ?>" class="sidebar-link">
+                    <i class="fa-solid fa-briefcase"></i>
+                    Lowongan Karir
+                </a>
+
+                <a href="<?= e(base_url('admin/security.php')); ?>" class="sidebar-link">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Security
+                </a>
+
+                <a href="<?= e(base_url('admin/testimonials.php')); ?>" class="sidebar-link">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    Testimoni
                 </a>
 
             </nav>

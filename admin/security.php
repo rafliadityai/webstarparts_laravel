@@ -106,6 +106,8 @@ function security_format_bytes_or_text(string $value): string
     </style>
 </head>
 <body>
+<?php render_admin_sidebar_assets(); ?>
+<?php render_admin_sidebar('security.php'); ?>
 <div class="wrap">
     <div class="top">
         <div class="title">
@@ -114,6 +116,20 @@ function security_format_bytes_or_text(string $value): string
         </div>
         <div class="nav">
             <a href="<?= e(base_url('admin/dashboard.php')); ?>"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+            <a href="<?= e(base_url('admin/content.php')); ?>"><i class="fa-solid fa-pen-ruler"></i> Content Center</a>
+            <a href="<?= e(base_url('admin/banners.php')); ?>"><i class="fa-solid fa-images"></i> Banner</a>
+            <a href="<?= e(base_url('admin/products.php')); ?>"><i class="fa-solid fa-box-open"></i> Produk</a>
+            <a href="<?= e(base_url('admin/categories.php')); ?>"><i class="fa-solid fa-layer-group"></i> Kategori</a>
+            <a href="<?= e(base_url('admin/brands.php')); ?>"><i class="fa-solid fa-tags"></i> Brand</a>
+            <a href="<?= e(base_url('admin/posts.php')); ?>"><i class="fa-solid fa-newspaper"></i> Berita</a>
+            <a href="<?= e(base_url('admin/media.php')); ?>"><i class="fa-solid fa-photo-film"></i> Media</a>
+            <a href="<?= e(base_url('admin/locations.php')); ?>"><i class="fa-solid fa-location-dot"></i> Lokasi</a>
+            <a href="<?= e(base_url('admin/messages.php')); ?>"><i class="fa-solid fa-envelope"></i> Pesan</a>
+            <a href="<?= e(base_url('admin/pages.php')); ?>"><i class="fa-solid fa-file-lines"></i> Halaman</a>
+            <a href="<?= e(base_url('admin/careers.php')); ?>"><i class="fa-solid fa-briefcase"></i> Lowongan Karir</a>
+            <a href="<?= e(base_url('admin/menus.php')); ?>"><i class="fa-solid fa-bars"></i> Menu</a>
+            <a href="<?= e(base_url('admin/settings.php')); ?>"><i class="fa-solid fa-gear"></i> Pengaturan</a>
+            <a href="<?= e(base_url('admin/testimonials.php')); ?>"><i class="fa-solid fa-comment-dots"></i> Testimoni</a>
             <?php if (strtolower((string) ($admin['role'] ?? '')) === 'superadmin'): ?>
                 <a href="<?= e(base_url('admin/users.php')); ?>"><i class="fa-solid fa-users-gear"></i> Admin Users</a>
             <?php endif; ?>
