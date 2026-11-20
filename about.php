@@ -1390,7 +1390,7 @@ require_once __DIR__ . '/includes/navbar.php';
                     <div
                         class="section-kicker"
                     >
-                        BRAND PORTFOLIO
+                        BRAND PARTNER
                     </div>
 
 
@@ -1407,8 +1407,8 @@ require_once __DIR__ . '/includes/navbar.php';
                     <p
                         class="section-description"
                     >
-                        Portofolio brand yang tersedia
-                        dalam jaringan Star Parts Motor.
+                        Portofolio brand akan terus dikembangkan
+                        untuk mendukung kebutuhan bisnis otomotif.
                     </p>
 
                 </div>
@@ -1441,16 +1441,30 @@ require_once __DIR__ . '/includes/navbar.php';
                                 )
                             );
 
-                        $brandLogo =
-                            trim(
-                                (string) (
-                                    $brand['logo']
-                                    ??
-                                    $brand['image']
-                                    ??
-                                    ''
-                                )
-                            );
+                        $brandNameKey = strtoupper(preg_replace('/[^A-Z0-9]/i', '', $brandName) ?? '');
+                        $brandLogo = '';
+                        $brandWordmarkClass = 'brand-wordmark-generic';
+
+                        // Gunakan logo resmi yang disetujui, bukan foto produk sebagai logo brand.
+                        if (str_contains($brandNameKey, 'OSRAM')) {
+                            $brandLogo = 'uploads/general/logo-osram.webp';
+                        } elseif (str_contains($brandNameKey, 'FDR')) {
+                            $brandLogo = 'uploads/general/fdr-tire-logo-red.webp';
+                        } elseif (str_contains($brandNameKey, 'HQFEDERAL')) {
+                            $brandLogo = 'uploads/general/logo-hqfederal.png';
+                        } elseif (str_contains($brandNameKey, 'ROTARY')) {
+                            $brandLogo = 'uploads/general/logo-rotary.png';
+                        } elseif (str_contains($brandNameKey, 'TAYORI')) {
+                            $brandWordmarkClass = 'brand-wordmark-tayori';
+                        } elseif (str_contains($brandNameKey, 'RAKUDA')) {
+                            $brandWordmarkClass = 'brand-wordmark-rakuda';
+                        } else {
+                            $brandLogo = trim((string) (
+                                $brand['logo']
+                                ?? $brand['image']
+                                ?? ''
+                            ));
+                        }
 
                         if (
                             $brandName === ''
@@ -1461,7 +1475,7 @@ require_once __DIR__ . '/includes/navbar.php';
                         ?>
 
                         <article
-                            class="brand-card"
+                            class="brand-card brand-card-logo-only"
                             data-aos="fade-up"
                         >
 
@@ -1470,34 +1484,19 @@ require_once __DIR__ . '/includes/navbar.php';
                             ): ?>
 
                                 <img
-                                    src="<?= e(
-                                        media_url(
-                                            $brandLogo
-                                        )
-                                    ); ?>"
-                                    alt="<?= e(
-                                        $brandName
-                                    ); ?>"
+                                    class="brand-card-logo"
+                                    src="<?= e(media_url($brandLogo)); ?>"
+                                    alt="Logo <?= e($brandName); ?>"
                                     loading="lazy"
+                                    decoding="async"
                                 >
 
                             <?php else: ?>
 
                                 <div
-                                    style="
-                                        width:100px;
-                                        height:60px;
-                                        display:flex;
-                                        align-items:center;
-                                        justify-content:center;
-                                        margin:0 auto;
-                                        border-radius:10px;
-                                        background:#f4f4f4;
-                                        color:#333;
-                                        font-family:var(--spm-font);
-                                        font-size:15px;
-                                        font-weight:800;
-                                    "
+                                    class="brand-card-wordmark <?= e($brandWordmarkClass); ?>"
+                                    role="img"
+                                    aria-label="Logo <?= e($brandName); ?>"
                                 >
                                     <?= e(
                                         $brandName
@@ -1505,15 +1504,6 @@ require_once __DIR__ . '/includes/navbar.php';
                                 </div>
 
                             <?php endif; ?>
-
-
-                            <div
-                                class="brand-card-title"
-                            >
-                                <?= e(
-                                    $brandName
-                                ); ?>
-                            </div>
 
 
                             <?php if (
@@ -1532,7 +1522,7 @@ require_once __DIR__ . '/includes/navbar.php';
                                     <?= e(
                                         excerpt(
                                             $brandDescription,
-                                            80
+                                            75
                                         )
                                     ); ?>
                                 </div>
