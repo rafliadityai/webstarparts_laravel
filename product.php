@@ -134,7 +134,7 @@ require __DIR__ . '/includes/navbar.php';
         <div class="fdr-product-visual-caption"><span><?= e($line['title']); ?></span><strong><?= e($productName); ?></strong></div>
     </div>
     <div class="fdr-product-information">
-        <div class="fdr-product-topbar"><div class="fdr-language-label"><span>Indonesia</span><span aria-hidden="true">|</span><span>English</span></div><a href="<?= e($virtualTireUrl); ?>" class="fdr-virtual-button" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrows-rotate"></i><span>Ganti Ban<br>Virtual</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a></div>
+        <!-- <div class="fdr-product-topbar"><div class="fdr-language-label"><span>Indonesia</span><span aria-hidden="true">|</span><span>English</span></div><a href="<?= e($virtualTireUrl); ?>" class="fdr-virtual-button" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrows-rotate"></i><span>Ganti Ban<br>Virtual</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a></div> -->
         <div class="fdr-product-heading">
             <div class="fdr-breadcrumb"><a href="<?= e(site_url()); ?>">Beranda</a><span>/</span><a href="<?= e(site_url('products.php?category=' . rawurlencode($categorySlug))); ?>"><?= e($line['title']); ?></a><span>/</span><span><?= e($productName); ?></span></div>
             <div class="fdr-category-pill"><?= e($line['title']); ?></div>
