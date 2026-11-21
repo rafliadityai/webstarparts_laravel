@@ -205,6 +205,7 @@ function render_admin_sidebar_assets(): void
             .spm-admin-sidebar-overlay.show { display: block; position: fixed; z-index: 79; inset: 0; background: rgba(15,23,42,.45); }
         }
     </style>
+    <script src="<?= e(base_url('admin/assets/media-picker.js')); ?>" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var sidebar = document.getElementById('spm-admin-sidebar');

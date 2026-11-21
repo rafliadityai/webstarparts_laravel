@@ -622,6 +622,13 @@ if (is_post()) {
 
     if ($action === 'upload_logo') {
 
+        $selectedLogo = selected_media_path('logo');
+        if ($selectedLogo !== '') {
+            set_setting('logo', $selectedLogo);
+            set_flash('success', 'Logo berhasil dipilih dari Media.');
+            redirect(BASE_URL . '/admin/settings.php');
+        }
+
         if (
             !isset($_FILES['logo']) ||
             empty($_FILES['logo']['name'])

@@ -664,6 +664,10 @@ if (
 
             $newGalleryUploads = [];
 
+            if (isset($_POST['remove_image']) && $_POST['remove_image'] === '1') {
+                $imagePath = '';
+            }
+
 
             /*
              * =================================================
@@ -723,6 +727,9 @@ if (
                             true;
                     }
                 }
+            } elseif (($selectedImage = selected_media_path('image')) !== '') {
+                $imagePath = $selectedImage;
+                $newImageUploaded = true;
             }
 
 
@@ -838,6 +845,19 @@ if (
 
                     $newGalleryUploads[] =
                         $newPath;
+                }
+            } elseif ($error === '' && isset($_POST['gallery_media']) && is_array($_POST['gallery_media'])) {
+                foreach ($_POST['gallery_media'] as $selectedGallery) {
+                    $selectedGallery = trim((string) $selectedGallery);
+                    $selectedGallery = str_replace('\\', '/', $selectedGallery);
+                    if (
+                        $selectedGallery !== ''
+                        && preg_match('~^uploads/[a-z0-9_-]+/.+\.[a-z0-9]+$~i', ltrim($selectedGallery, '/'))
+                        && str_starts_with(ltrim($selectedGallery, '/'), 'uploads/')
+                    ) {
+                        $gallery[] = ltrim($selectedGallery, '/');
+                        $newGalleryUploads[] = ltrim($selectedGallery, '/');
+                    }
                 }
             }
 
@@ -1100,7 +1120,15 @@ if (
                          */
 
                         if (
-                            $newImageUploaded
+                            (
+                                $newImageUploaded
+                                ||
+                                (
+                                    isset($_POST['remove_image'])
+                                    &&
+                                    $_POST['remove_image'] === '1'
+                                )
+                            )
                             &&
                             !empty(
                                 $existingProduct['image']

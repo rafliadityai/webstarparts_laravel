@@ -178,7 +178,9 @@ if (is_post()) {
         */
         $image = $oldImage['logo'] ?? null;
 
-        if (!empty($_FILES['image']['name'])) {
+        if (isset($_POST['remove_image']) && $_POST['remove_image'] === '1') {
+            $image = null;
+        } elseif (!empty($_FILES['image']['name'])) {
             $upload = upload_image(
                 $_FILES['image'],
                 $uploadDir,
@@ -201,7 +203,9 @@ if (is_post()) {
                 redirect(BASE_URL . '/admin/brands.php' . ($id ? '?edit=' . $id : ''));
             }
 
-            $image = $upload['filename'];
+            $image = $upload['path'];
+        } elseif (($selectedImage = selected_media_path('image')) !== '') {
+            $image = $selectedImage;
         }
 
         try {

@@ -315,6 +315,8 @@ if (is_post()) {
             }
 
             $featuredImage = (string) $upload['path'];
+        } elseif (($selectedImage = selected_media_path('featured_image')) !== '') {
+            $featuredImage = $selectedImage;
         }
 
         /*

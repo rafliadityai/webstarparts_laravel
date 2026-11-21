@@ -162,6 +162,9 @@ if (is_post()) {
             }
             career_delete_poster($oldPoster);
             $poster = (string) $upload['path'];
+        } elseif (($selectedPoster = selected_media_path('poster')) !== '') {
+            career_delete_poster($oldPoster);
+            $poster = $selectedPoster;
         }
 
         $slug = career_job_slug($pdo, $title, $id);

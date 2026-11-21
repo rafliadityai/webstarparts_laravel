@@ -357,7 +357,9 @@ if (is_post()) {
 
         $image = $oldPost['featured_image'] ?? null;
 
-        if (
+        if (isset($_POST['remove_featured_image']) && $_POST['remove_featured_image'] === '1') {
+            $image = null;
+        } elseif (
             isset($_FILES['image']) &&
             !empty($_FILES['image']['name'])
         ) {
@@ -386,6 +388,8 @@ if (is_post()) {
             }
 
             $image = $upload['path'];
+        } elseif (($selectedImage = selected_media_path('image')) !== '') {
+            $image = $selectedImage;
         }
 
         /*

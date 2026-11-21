@@ -215,6 +215,10 @@ function content_save_page(PDO $pdo, string $slug, array $data): void
 
 function content_upload_image(string $field, string $folder = 'images'): array
 {
+    $selected = selected_media_path($field);
+    if ($selected !== '') {
+        return ['success' => true, 'path' => $selected, 'message' => 'Media dipilih.'];
+    }
     if (!isset($_FILES[$field]) || !is_array($_FILES[$field])) {
         return ['success' => false, 'message' => ''];
     }
@@ -382,6 +386,10 @@ if (is_post()) {
                 }
                 content_delete_local_file($current);
                 content_setting_save($pdo, $imageField['key'], (string) $upload['path'], 'image');
+            } elseif (selected_media_path($imageField['upload_field']) !== '') {
+                $selected = selected_media_path($imageField['upload_field']);
+                content_delete_local_file($current);
+                content_setting_save($pdo, $imageField['key'], $selected, 'image');
             }
         }
 
@@ -398,6 +406,9 @@ if (is_post()) {
                 }
                 content_delete_local_file($currentOg);
                 content_setting_save($pdo, 'home_og_image', (string) $upload['path'], 'image');
+            } elseif (selected_media_path('home_og_image_upload') !== '') {
+                content_delete_local_file($currentOg);
+                content_setting_save($pdo, 'home_og_image', selected_media_path('home_og_image_upload'), 'image');
             }
         }
 
@@ -413,6 +424,9 @@ if (is_post()) {
                 }
                 content_delete_local_file($currentOg);
                 content_setting_save($pdo, 'products_og_image', (string) $upload['path'], 'image');
+            } elseif (selected_media_path('products_og_image_upload') !== '') {
+                content_delete_local_file($currentOg);
+                content_setting_save($pdo, 'products_og_image', selected_media_path('products_og_image_upload'), 'image');
             }
         }
 
@@ -428,6 +442,9 @@ if (is_post()) {
                 }
                 content_delete_local_file($currentOg);
                 content_setting_save($pdo, 'news_og_image', (string) $upload['path'], 'image');
+            } elseif (selected_media_path('news_og_image_upload') !== '') {
+                content_delete_local_file($currentOg);
+                content_setting_save($pdo, 'news_og_image', selected_media_path('news_og_image_upload'), 'image');
             }
         }
 
@@ -443,6 +460,9 @@ if (is_post()) {
                 }
                 content_delete_local_file($currentOg);
                 content_setting_save($pdo, 'contact_image', (string) $upload['path'], 'image');
+            } elseif (selected_media_path('contact_image_upload') !== '') {
+                content_delete_local_file($currentOg);
+                content_setting_save($pdo, 'contact_image', selected_media_path('contact_image_upload'), 'image');
             }
         }
 
@@ -470,6 +490,9 @@ if (is_post()) {
                 }
                 content_delete_local_file($currentImage);
                 $newImage = (string) $upload['path'];
+            } elseif (selected_media_path('career_image_upload') !== '') {
+                content_delete_local_file($currentImage);
+                $newImage = selected_media_path('career_image_upload');
             }
 
             content_save_page($pdo, 'career', [

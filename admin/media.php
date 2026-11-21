@@ -254,6 +254,61 @@ function media_local_path_from_record(
 
 /*
 |--------------------------------------------------------------------------
+| Media Picker JSON
+|--------------------------------------------------------------------------
+*/
+
+if (
+    isset($_GET['action']) &&
+    $_GET['action'] === 'picker'
+) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    $type = strtolower(trim((string) get_string('type', '')));
+    $search = trim((string) get_string('search', ''));
+    $page = max(1, get_int('page'));
+    $perPage = 24;
+    $offset = ($page - 1) * $perPage;
+
+    $where = [];
+    $params = [];
+    if ($type === 'image') {
+        $where[] = "file_type = 'image'";
+    } elseif ($type === 'video') {
+        $where[] = "file_type = 'video'";
+    }
+    if ($search !== '') {
+        $where[] = "(title LIKE ? OR file_name LIKE ?)";
+        $params[] = '%' . $search . '%';
+        $params[] = '%' . $search . '%';
+    }
+
+    $sql = "SELECT id, title, alt_text, file_name, file_path, file_type, mime_type, file_size, image_width, image_height
+            FROM media";
+    if ($where) {
+        $sql .= " WHERE " . implode(' AND ', $where);
+    }
+    $sql .= " ORDER BY id DESC LIMIT " . $perPage . " OFFSET " . $offset;
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($items as &$item) {
+            $item['url'] = media_public_url((string) ($item['file_path'] ?? ''));
+        }
+        unset($item);
+
+        echo json_encode(['success' => true, 'items' => $items], JSON_UNESCAPED_SLASHES);
+    } catch (Throwable $e) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Daftar media gagal dimuat.']);
+    }
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
 | POST ACTION
 |--------------------------------------------------------------------------
 */
@@ -285,7 +340,6 @@ if (is_post()) {
         $altText = trim(
             post_string('alt_text')
         );
-
         if (mb_strlen($altText) > 500) {
             $altText = mb_substr($altText, 0, 500);
         }
@@ -296,390 +350,113 @@ if (is_post()) {
         |--------------------------------------------------------------------------
         */
 
-        if (
-            !isset($_FILES['media_file']) ||
-            empty($_FILES['media_file']['name'])
-        ) {
-
-            set_flash(
-                'error',
-                'Silakan pilih file media terlebih dahulu.'
-            );
-
-            redirect(
-                BASE_URL .
-                '/admin/media.php'
-            );
+        if (!isset($_FILES['media_file']) || !is_array($_FILES['media_file']['name'])) {
+            set_flash('error', 'Silakan pilih satu atau beberapa file media.');
+            redirect(BASE_URL . '/admin/media.php');
         }
 
-        $file = $_FILES['media_file'];
+        $names = $_FILES['media_file']['name'];
+        $tmpNames = $_FILES['media_file']['tmp_name'];
+        $errors = $_FILES['media_file']['error'];
+        $sizes = $_FILES['media_file']['size'];
+        $types = $_FILES['media_file']['type'];
+        $successCount = 0;
+        $failedCount = 0;
+        $currentAdminId = !empty($admin['id']) ? (int) $admin['id'] : null;
 
-        if (
-            !isset($file['error']) ||
-            $file['error'] !== UPLOAD_ERR_OK
-        ) {
+        for ($i = 0; $i < count($names); $i++) {
+            $file = [
+                'name' => (string) ($names[$i] ?? ''),
+                'tmp_name' => (string) ($tmpNames[$i] ?? ''),
+                'error' => (int) ($errors[$i] ?? UPLOAD_ERR_NO_FILE),
+                'size' => (int) ($sizes[$i] ?? 0),
+                'type' => (string) ($types[$i] ?? '')
+            ];
 
-            set_flash(
-                'error',
-                'Upload file gagal. Silakan coba kembali.'
-            );
+            if ($file['error'] !== UPLOAD_ERR_OK || $file['tmp_name'] === '' || !is_uploaded_file($file['tmp_name'])) {
+                $failedCount++;
+                continue;
+            }
 
-            redirect(
-                BASE_URL .
-                '/admin/media.php'
-            );
-        }
+            $mimeType = function_exists('mime_content_type') ? @mime_content_type($file['tmp_name']) : '';
+            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            $videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'm4v'];
+            $isImage = in_array($extension, $imageExtensions, true);
+            $isVideo = in_array($extension, $videoExtensions, true);
+            $fileFolder = $isVideo ? 'videos' : (($isImage && $folder !== 'videos') ? $folder : 'images');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Tentukan tipe media
-        |--------------------------------------------------------------------------
-        */
+            if (!$isImage && !$isVideo) {
+                $failedCount++;
+                continue;
+            }
 
-        $mimeType =
-            function_exists('mime_content_type')
-                ? @mime_content_type(
-                    $file['tmp_name']
-                )
-                : '';
+            $allowedMime = $isImage
+                ? ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+                : ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-m4v'];
+            $maxSize = $isImage ? 10 * 1024 * 1024 : 100 * 1024 * 1024;
 
-        $extension = strtolower(
-            pathinfo(
-                $file['name'],
-                PATHINFO_EXTENSION
-            )
-        );
+            if (($mimeType !== '' && !in_array($mimeType, $allowedMime, true)) || (int) $file['size'] > $maxSize) {
+                $failedCount++;
+                continue;
+            }
 
-        $imageExtensions = [
-            'jpg',
-            'jpeg',
-            'png',
-            'webp',
-            'gif'
-        ];
+            $baseName = slugify(pathinfo(basename($file['name']), PATHINFO_FILENAME));
+            if ($baseName === '') $baseName = 'media';
+            $newFilename = $baseName . '-' . date('YmdHis') . '-' . bin2hex(random_bytes(4)) . '.' . $extension;
+            $targetPath = media_get_folder_path($fileFolder) . '/' . $newFilename;
 
-        $videoExtensions = [
-            'mp4',
-            'webm',
-            'ogg',
-            'mov',
-            'm4v'
-        ];
+            if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+                $failedCount++;
+                continue;
+            }
 
-        $isImage =
-            in_array(
-                $extension,
-                $imageExtensions,
-                true
-            );
+            $variantFiles = $isImage ? generate_image_variants($targetPath) : [];
+            $relativePath = media_build_relative_path($fileFolder, $newFilename);
+            $imageWidth = null;
+            $imageHeight = null;
+            if ($isImage) {
+                $imageInfo = @getimagesize($targetPath);
+                if (is_array($imageInfo)) {
+                    $imageWidth = (int) ($imageInfo[0] ?? 0) ?: null;
+                    $imageHeight = (int) ($imageInfo[1] ?? 0) ?: null;
+                }
+            }
 
-        $isVideo =
-            in_array(
-                $extension,
-                $videoExtensions,
-                true
-            );
-
-        $imageWidth = null;
-        $imageHeight = null;
-
-        if ($isImage) {
-            $imageInfo = @getimagesize($file['tmp_name']);
-
-            if (is_array($imageInfo)) {
-                $imageWidth = isset($imageInfo[0]) ? (int) $imageInfo[0] : null;
-                $imageHeight = isset($imageInfo[1]) ? (int) $imageInfo[1] : null;
+            try {
+                $stmt = $pdo->prepare("
+                    INSERT INTO media
+                    (title, alt_text, file_name, file_path, file_type, mime_type, file_size, image_width, image_height, uploaded_by, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                ");
+                $stmt->execute([
+                    $title !== '' ? $title : $baseName,
+                    $altText !== '' ? $altText : null,
+                    $newFilename,
+                    $relativePath,
+                    $isVideo ? 'video' : 'image',
+                    $mimeType !== '' ? $mimeType : null,
+                    (int) $file['size'],
+                    $imageWidth,
+                    $imageHeight,
+                    $currentAdminId
+                ]);
+                $successCount++;
+            } catch (Throwable $e) {
+                media_delete_local_file($targetPath);
+                $failedCount++;
             }
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Folder otomatis untuk tipe media
-        |--------------------------------------------------------------------------
-        */
-
-        if ($isVideo) {
-            $folder = 'videos';
-        } elseif ($isImage && $folder === 'videos') {
-            $folder = 'images';
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Validasi MIME
-        |--------------------------------------------------------------------------
-        */
-
-        $allowedImageMime = [
-            'image/jpeg',
-            'image/png',
-            'image/webp',
-            'image/gif'
-        ];
-
-        $allowedVideoMime = [
-            'video/mp4',
-            'video/webm',
-            'video/ogg',
-            'video/quicktime',
-            'video/x-m4v'
-        ];
-
-        if ($isImage) {
-
-            if (
-                $mimeType !== '' &&
-                !in_array(
-                    $mimeType,
-                    $allowedImageMime,
-                    true
-                )
-            ) {
-
-                set_flash(
-                    'error',
-                    'Format file gambar tidak valid.'
-                );
-
-                redirect(
-                    BASE_URL .
-                    '/admin/media.php'
-                );
-            }
-
-            $maxSize =
-                10 *
-                1024 *
-                1024;
-
-        } elseif ($isVideo) {
-
-            if (
-                $mimeType !== '' &&
-                !in_array(
-                    $mimeType,
-                    $allowedVideoMime,
-                    true
-                )
-            ) {
-
-                set_flash(
-                    'error',
-                    'Format file video tidak valid.'
-                );
-
-                redirect(
-                    BASE_URL .
-                    '/admin/media.php'
-                );
-            }
-
-            $maxSize =
-                100 *
-                1024 *
-                1024;
-
+        if ($successCount > 0 && $failedCount === 0) {
+            set_flash('success', $successCount . ' file media berhasil diupload.');
+        } elseif ($successCount > 0) {
+            set_flash('success', $successCount . ' file berhasil diupload. ' . $failedCount . ' file gagal atau tidak didukung.');
         } else {
-
-            set_flash(
-                'error',
-                'Jenis file belum didukung. Gunakan JPG, PNG, WEBP, GIF, MP4, WEBM atau OGG.'
-            );
-
-            redirect(
-                BASE_URL .
-                '/admin/media.php'
-            );
+            set_flash('error', 'Tidak ada file yang berhasil diupload. ' . $failedCount . ' file gagal atau tidak didukung.');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Size
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            (int) $file['size'] >
-            $maxSize
-        ) {
-
-            set_flash(
-                'error',
-                $isVideo
-                    ? 'Ukuran video maksimal 100 MB.'
-                    : 'Ukuran gambar maksimal 10 MB.'
-            );
-
-            redirect(
-                BASE_URL .
-                '/admin/media.php'
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Generate filename aman
-        |--------------------------------------------------------------------------
-        */
-
-        $originalName =
-            basename(
-                $file['name']
-            );
-
-        $baseName =
-            pathinfo(
-                $originalName,
-                PATHINFO_FILENAME
-            );
-
-        $safeBase =
-            slugify(
-                $baseName
-            );
-
-        if ($safeBase === '') {
-            $safeBase = 'media';
-        }
-
-        $newFilename =
-            $safeBase .
-            '-' .
-            date('YmdHis') .
-            '-' .
-            bin2hex(
-                random_bytes(4)
-            ) .
-            '.' .
-            $extension;
-
-        $targetDir =
-            media_get_folder_path(
-                $folder
-            );
-
-        $targetPath =
-            $targetDir .
-            '/' .
-            $newFilename;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Upload file
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            !move_uploaded_file(
-                $file['tmp_name'],
-                $targetPath
-            )
-        ) {
-
-            set_flash(
-                'error',
-                'File gagal dipindahkan ke folder upload.'
-            );
-
-            redirect(
-                BASE_URL .
-                '/admin/media.php'
-            );
-        }
-
-        $variantFiles = $isImage
-            ? generate_image_variants($targetPath)
-            : [];
-
-        $relativePath =
-            media_build_relative_path(
-                $folder,
-                $newFilename
-            );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Simpan Database
-        |--------------------------------------------------------------------------
-        */
-
-        try {
-
-            $stmt = $pdo->prepare("
-                INSERT INTO media
-                (
-                    title,
-                    alt_text,
-                    file_name,
-                    file_path,
-                    file_type,
-                    mime_type,
-                    file_size,
-                    image_width,
-                    image_height,
-                    uploaded_by,
-                    created_at
-                )
-                VALUES
-                (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW()
-                )
-            ");
-
-            $currentAdminId =
-                !empty($admin['id'])
-                    ? (int) $admin['id']
-                    : null;
-
-            $stmt->execute([
-                $title !== ''
-                    ? $title
-                    : $baseName,
-                $altText !== ''
-                    ? $altText
-                    : null,
-                $newFilename,
-                $relativePath,
-                $isVideo
-                    ? 'video'
-                    : 'image',
-                $mimeType !== ''
-                    ? $mimeType
-                    : null,
-                (int) $file['size'],
-                $imageWidth,
-                $imageHeight,
-                $currentAdminId
-            ]);
-
-            $successMessage = 'Media berhasil diupload.';
-            if ($isImage && $variantFiles) {
-                $successMessage .= ' ' . count($variantFiles) . ' versi WebP responsive otomatis dibuat.';
-            } elseif ($isImage && !image_processing_available()) {
-                $successMessage .= ' Server belum mengaktifkan GD; file asli tetap digunakan.';
-            }
-
-            set_flash(
-                'success',
-                $successMessage
-            );
-
-        } catch (Throwable $e) {
-
-            media_delete_local_file(
-                $targetPath
-            );
-
-            set_flash(
-                'error',
-                'Media gagal disimpan ke database.'
-            );
-        }
-
-        redirect(
-            BASE_URL .
-            '/admin/media.php'
-        );
+        redirect(BASE_URL . '/admin/media.php');
     }
 
     /*
@@ -716,7 +493,7 @@ if (is_post()) {
 
     if ($action === 'update') {
 
-        $id = get_int('id');
+        $id = post_int('id');
 
         $title = trim(
             post_string('title')
@@ -818,7 +595,7 @@ if (is_post()) {
 
     if ($action === 'delete') {
 
-        $id = get_int('id');
+        $id = post_int('id');
 
         if ($id <= 0) {
 
@@ -2561,10 +2338,11 @@ $flash = get_flash();
 
                                 <input
                                     type="file"
-                                    name="media_file"
+                                    name="media_file[]"
                                     id="mediaFile"
                                     accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/ogg,video/quicktime"
                                     style="display:none;"
+                                    multiple
                                     required
                                 >
 
@@ -3465,9 +3243,13 @@ document.addEventListener(
                 return;
             }
 
-            updateFileInfo(
-                fileList[0]
-            );
+            const names = Array.from(fileList).map(function (file) {
+                return file.name + ' (' + formatBytes(file.size) + ')';
+            });
+            updateFileInfo(fileList[0]);
+            if (fileNamePreview) {
+                fileNamePreview.textContent = names.join(' • ');
+            }
 
         }
 

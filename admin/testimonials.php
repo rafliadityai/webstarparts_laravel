@@ -316,6 +316,11 @@ function testimonial_delete_file(
 ): void {
 
     if (
+        isset($_POST['remove_image']) &&
+        $_POST['remove_image'] === '1'
+    ) {
+        $image = null;
+    } elseif (
         $path &&
         is_file($path)
     ) {
@@ -584,7 +589,9 @@ if (is_post()) {
             }
 
             $image =
-                $upload['filename'];
+                $upload['path'];
+        } elseif (($selectedImage = selected_media_path('image')) !== '') {
+            $image = $selectedImage;
         }
 
         /*

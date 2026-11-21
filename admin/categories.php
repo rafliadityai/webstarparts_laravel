@@ -514,6 +514,9 @@ if (
                      * gambar baru akan menggantikannya.
                      */
                 }
+                } elseif (($selectedImage = selected_media_path('image')) !== '') {
+                $imagePath = $selectedImage;
+                $newImageUploaded = true;
             }
 
 

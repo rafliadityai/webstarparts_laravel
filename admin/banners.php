@@ -396,6 +396,14 @@ if (
                 $newVideoUploaded =
                     false;
 
+                if (isset($_POST['remove_image']) && $_POST['remove_image'] === '1') {
+                    $imagePath = '';
+                }
+
+                if (isset($_POST['remove_video']) && $_POST['remove_video'] === '1') {
+                    $videoPath = '';
+                }
+
 
                 /*
                  * =================================================
@@ -441,6 +449,9 @@ if (
                         $newImageUploaded =
                             true;
                     }
+                } elseif (($selectedImage = selected_media_path('image')) !== '') {
+                    $imagePath = $selectedImage;
+                    $newImageUploaded = true;
                 }
 
 
@@ -506,6 +517,9 @@ if (
                         $newVideoUploaded =
                             true;
                     }
+                } elseif (($selectedVideo = selected_media_path('video')) !== '') {
+                    $videoPath = $selectedVideo;
+                    $newVideoUploaded = true;
                 }
 
 
@@ -572,7 +586,15 @@ if (
                              */
 
                             if (
-                                $newImageUploaded
+                                (
+                                    $newImageUploaded
+                                    ||
+                                    (
+                                        isset($_POST['remove_image'])
+                                        &&
+                                        $_POST['remove_image'] === '1'
+                                    )
+                                )
                                 &&
                                 !empty(
                                     $existingBanner['image']
@@ -590,7 +612,15 @@ if (
 
 
                             if (
-                                $newVideoUploaded
+                                (
+                                    $newVideoUploaded
+                                    ||
+                                    (
+                                        isset($_POST['remove_video'])
+                                        &&
+                                        $_POST['remove_video'] === '1'
+                                    )
+                                )
                                 &&
                                 !empty(
                                     $existingBanner['video']

@@ -1785,6 +1785,77 @@ if (!function_exists('ensure_directory')) {
 }
 
 
+if (!function_exists('selected_media_path')) {
+    function selected_media_path(string $field): string
+    {
+        $value = trim((string) ($_POST[$field . '_media'] ?? ''));
+        $value = str_replace('\\', '/', $value);
+        $value = ltrim($value, '/');
+        if (
+            $value === ''
+            || str_starts_with($value, '../')
+            || preg_match('~(?:^|/)\.\.(?:/|$)~', $value)
+            || !preg_match('~^uploads/[a-z0-9_-]+/.+\.[a-z0-9]+$~i', $value)
+        ) {
+            return '';
+        }
+        return $value;
+    }
+}
+
+
+if (!function_exists('register_uploaded_media')) {
+    function register_uploaded_media(string $relativePath, string $folder, array $file, string $mime): void
+    {
+        global $pdo;
+        if (!isset($pdo) || !($pdo instanceof PDO)) {
+            return;
+        }
+
+        $extension = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
+        $videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'm4v'];
+        $isVideo = in_array($extension, $videoExtensions, true);
+        $filename = basename(str_replace('\\', '/', $relativePath));
+        $title = pathinfo($filename, PATHINFO_FILENAME);
+        $width = null;
+        $height = null;
+
+        if (!$isVideo) {
+            $localPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
+            $imageInfo = @getimagesize($localPath);
+            if (is_array($imageInfo)) {
+                $width = (int) ($imageInfo[0] ?? 0) ?: null;
+                $height = (int) ($imageInfo[1] ?? 0) ?: null;
+            }
+        }
+
+        $admin = function_exists('current_admin') ? current_admin() : null;
+        $adminId = !empty($admin['id']) ? (int) $admin['id'] : null;
+
+        try {
+            $stmt = $pdo->prepare(
+                "INSERT INTO media
+                    (title, alt_text, file_name, file_path, file_type, mime_type, file_size, image_width, image_height, uploaded_by, created_at)
+                 VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+            );
+            $stmt->execute([
+                $title,
+                $filename,
+                $relativePath,
+                $isVideo ? 'video' : 'image',
+                $mime,
+                (int) ($file['size'] ?? 0),
+                $width,
+                $height,
+                $adminId
+            ]);
+        } catch (Throwable $e) {
+            error_log('Media library registration failed: ' . $e->getMessage());
+        }
+    }
+}
+
+
 /*
 |--------------------------------------------------------------------------
 | UPLOAD IMAGE
@@ -1798,17 +1869,21 @@ if (!function_exists('upload_image')) {
         string $folder = 'media'
     ): array {
 
+        $folder = preg_replace('/[^a-z0-9_-]/i', '-', trim($folder, '/\\')) ?: 'media';
+
         if (
             !isset(
                 $file['error']
             )
             ||
-            $file['error'] !== UPLOAD_ERR_OK
+            (int) $file['error'] !== UPLOAD_ERR_OK
         ) {
 
             return [
                 'success' => false,
-                'message' => 'File gambar gagal diupload.'
+                'message' => ((int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_INI_SIZE || (int) ($file['error'] ?? 0) === UPLOAD_ERR_FORM_SIZE)
+                    ? 'Ukuran file melebihi batas upload server.'
+                    : 'File gambar gagal diupload.'
             ];
         }
 
@@ -1925,6 +2000,8 @@ if (!function_exists('upload_image')) {
             . '/'
             . $filename;
 
+        register_uploaded_media($relativePath, $folder, $file, (string) $mime);
+
         return [
             'success' => true,
             'message' => 'Gambar berhasil diupload.',
@@ -1955,17 +2032,21 @@ if (!function_exists('upload_video')) {
         string $folder = 'media'
     ): array {
 
+        $folder = preg_replace('/[^a-z0-9_-]/i', '-', trim($folder, '/\\')) ?: 'media';
+
         if (
             !isset(
                 $file['error']
             )
             ||
-            $file['error'] !== UPLOAD_ERR_OK
+            (int) $file['error'] !== UPLOAD_ERR_OK
         ) {
 
             return [
                 'success' => false,
-                'message' => 'File video gagal diupload.'
+                'message' => ((int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_INI_SIZE || (int) ($file['error'] ?? 0) === UPLOAD_ERR_FORM_SIZE)
+                    ? 'Ukuran file melebihi batas upload server.'
+                    : 'File video gagal diupload.'
             ];
         }
 
@@ -2083,6 +2164,8 @@ if (!function_exists('upload_video')) {
             . trim($folder, '/')
             . '/'
             . $filename;
+
+        register_uploaded_media($relativePath, $folder, $file, (string) $mime);
 
         return [
             'success' => true,
