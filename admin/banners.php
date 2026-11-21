@@ -19,6 +19,9 @@ require_once dirname(__DIR__) . '/includes/functions.php';
 
 require_admin();
 
+try { $pdo->exec("ALTER TABLE banners ADD COLUMN placement VARCHAR(20) NOT NULL DEFAULT 'home'"); } catch (Throwable $e) {}
+try { $pdo->exec("ALTER TABLE banners ADD COLUMN image_link VARCHAR(255) NULL"); } catch (Throwable $e) {}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -328,6 +331,9 @@ if (
 
 
             $imageAlt = trim(post_string('image_alt'));
+            $placement = post_string('placement', 'home');
+            if (!in_array($placement, ['home', 'catalog_top', 'catalog_bottom'], true)) $placement = 'home';
+            $imageLink = trim(post_string('image_link'));
 
 
             $sortOrder =
@@ -551,7 +557,9 @@ if (
                                         image_alt = ?,
                                         video = ?,
                                         sort_order = ?,
-                                        is_active = ?
+                                        is_active = ?,
+                                        placement = ?,
+                                        image_link = ?
                                      WHERE id = ?"
                                 );
 
@@ -576,6 +584,8 @@ if (
                                     : null,
                                 $sortOrder,
                                 $isActive,
+                                $placement,
+                                $imageLink !== '' ? $imageLink : null,
                                 $id
                             ]);
 
@@ -656,10 +666,14 @@ if (
                                         image_alt,
                                         video,
                                         sort_order,
-                                        is_active
+                                        is_active,
+                                        placement,
+                                        image_link
                                     )
                                     VALUES
                                     (
+                                        ?,
+                                        ?,
                                         ?,
                                         ?,
                                         ?,
@@ -692,7 +706,9 @@ if (
                                     ? $videoPath
                                     : null,
                                 $sortOrder,
-                                $isActive
+                                $isActive,
+                                $placement,
+                                $imageLink !== '' ? $imageLink : null
                             ]);
 
 
@@ -1108,7 +1124,9 @@ $formData = [
         )
             ? (int)
                 $editBanner['is_active']
-            : 1
+            : 1,
+    'placement' => $editBanner['placement'] ?? 'home',
+    'image_link' => $editBanner['image_link'] ?? ''
 
 ];
 
@@ -3507,6 +3525,21 @@ $formVideoUrl =
 
 
                             <!-- =====================================
+                                 PLACEMENT
+                            ====================================== -->
+
+                            <div class="form-group">
+                                <label class="form-label" for="placement">Lokasi Banner</label>
+                                <select id="placement" name="placement" class="form-control">
+                                    <option value="home" <?= ($formData['placement'] ?? 'home') === 'home' ? 'selected' : ''; ?>>Beranda</option>
+                                    <option value="catalog_top" <?= ($formData['placement'] ?? '') === 'catalog_top' ? 'selected' : ''; ?>>Katalog - Bagian Atas</option>
+                                    <option value="catalog_bottom" <?= ($formData['placement'] ?? '') === 'catalog_bottom' ? 'selected' : ''; ?>>Katalog - Bagian Bawah</option>
+                                </select>
+                                <div class="input-note">Atur banner khusus untuk area katalog yang ditunjukkan pada halaman Produk.</div>
+                            </div>
+
+
+                            <!-- =====================================
                                  SUBTITLE
                             ====================================== -->
 
@@ -3603,6 +3636,16 @@ $formVideoUrl =
                                     placeholder="Contoh: products.php"
                                 >
 
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="form-label" for="image_link">Link Gambar / HREF</label>
+                                <input type="text" id="image_link" name="image_link" class="form-control"
+                                    value="<?= e((string)($formData['image_link'] ?? '')); ?>"
+                                    maxlength="255"
+                                    placeholder="Contoh: products.php#catalog atau https://domain.com/produk">
+                                <div class="input-note">Digunakan saat banner/gambar di sebelah kanan diklik.</div>
                             </div>
 
 

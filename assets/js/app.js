@@ -953,7 +953,7 @@
          */
 
         StarParts.$$(
-            '.hero-swiper, .hero-slider'
+            '.hero-swiper, .hero-slider, .spm-catalog-banner-swiper, .spm-catalog-right-swiper'
         ).forEach(
             function (element) {
 
@@ -969,7 +969,7 @@
 
                 try {
 
-                    new window.Swiper(
+                    var catalogSwiper = new window.Swiper(
                         element,
                         {
 
@@ -1018,6 +1018,38 @@
 
                         }
                     );
+
+                    if (element.classList.contains('spm-catalog-right-swiper')) {
+                        var copyPanel = element.closest('[data-catalog-copy]');
+                        var titleElement = copyPanel ? copyPanel.querySelector('[data-catalog-title]') : null;
+                        var subtitleElement = copyPanel ? copyPanel.querySelector('[data-catalog-subtitle]') : null;
+                        var actionElement = copyPanel ? copyPanel.querySelector('[data-catalog-action]') : null;
+                        var buttonElement = copyPanel ? copyPanel.querySelector('[data-catalog-button]') : null;
+
+                        function updateCatalogCopy(swiper) {
+                            var slide = swiper.slides[swiper.activeIndex];
+                            if (!slide) return;
+                            var slideTitle = slide.dataset.catalogTitle || '';
+                            var slideSubtitle = slide.dataset.catalogSubtitle || '';
+                            var slideButton = slide.dataset.catalogButton || '';
+                            var slideUrl = slide.dataset.catalogUrl || '';
+
+                            if (titleElement) titleElement.textContent = slideTitle || 'Katalog FDR 2026';
+                            if (subtitleElement) subtitleElement.textContent = slideSubtitle;
+                            if (actionElement) {
+                                actionElement.hidden = !(slideButton && slideUrl);
+                            }
+                            if (buttonElement) {
+                                buttonElement.href = slideUrl || '#';
+                                buttonElement.childNodes[0].nodeValue = slideButton ? (slideButton + ' ') : '';
+                            }
+                        }
+
+                        updateCatalogCopy(catalogSwiper);
+                        catalogSwiper.on('slideChange', function () {
+                            updateCatalogCopy(catalogSwiper);
+                        });
+                    }
 
 
                     element.dataset.swiperInitialized =

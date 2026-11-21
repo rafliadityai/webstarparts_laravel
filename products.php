@@ -522,6 +522,21 @@ if ($isOsramCatalogPage) {
     $extraHead = (string)($extraHead ?? '') . '<link rel="stylesheet" href="' . e(base_url('assets/css/osram-products.css')) . '">';
 }
 
+$catalogTopBanners = [];
+try {
+    $catalogBannerStmt = $pdo->prepare(
+        "SELECT id, title, subtitle, button_text, button_url, image, image_alt, image_link, video, placement
+         FROM banners
+         WHERE is_active = 1
+           AND placement IN ('catalog_top', 'catalog_bottom')
+         ORDER BY sort_order ASC, id DESC"
+    );
+    $catalogBannerStmt->execute();
+    foreach ($catalogBannerStmt->fetchAll(PDO::FETCH_ASSOC) as $catalogBanner) {
+        $catalogTopBanners[] = $catalogBanner;
+    }
+} catch (Throwable $e) {}
+
 /*
 |--------------------------------------------------------------------------
 | Breadcrumb
@@ -1627,27 +1642,69 @@ require __DIR__ . '/includes/navbar.php';
 
     </section>
 
+    <?php if (!empty($catalogTopBanners)): ?>
     <section class="section spm-catalog-page-section" id="catalog">
         <div class="container">
             <div class="spm-catalog-page-panel">
-                <div class="spm-catalog-grid">
-                    <div class="spm-catalog-copy">
-                        <div class="section-kicker">MATERI KATALOG</div>
-                        <h2 class="section-title">Katalog <span>FDR 2026</span></h2>
-                        <p class="section-description" style="margin-left:0;text-align:left;">Buka gambar katalog beresolusi penuh untuk menelusuri tipe dan ukuran yang tercantum pada materi FDR 2026. Informasi harga, stok, dan ketersediaan dapat dikonfirmasi langsung kepada tim Star Parts Motor.</p>
-                        <div class="spm-catalog-actions">
-                            <a class="btn btn-primary" href="<?= e(base_url('uploads/general/katalog-fdr-2026.pdf')); ?>" download="Katalog-FDR-2026.pdf">Unduh Katalog PDF <i class="fa-solid fa-file-pdf"></i></a>
-                            <a class="btn btn-outline" href="<?= e(base_url('uploads/general/katalog-fdr-2026.jpg')); ?>" target="_blank" rel="noopener noreferrer">Lihat JPG Resolusi Tinggi <i class="fa-solid fa-up-right-from-square"></i></a>
-                            <a class="btn btn-outline" href="<?= e(base_url('contact.php')); ?>">Tanyakan Produk <i class="fa-solid fa-arrow-right"></i></a>
+                <?php if (!empty($catalogTopBanners)): ?>
+                    <?php
+                    $firstCatalogBanner = $catalogTopBanners[0];
+                    $firstTitle = trim((string)($firstCatalogBanner['title'] ?? ''));
+                    $firstSubtitle = trim((string)($firstCatalogBanner['subtitle'] ?? ''));
+                    $firstButtonText = trim((string)($firstCatalogBanner['button_text'] ?? ''));
+                    $firstButtonUrl = trim((string)($firstCatalogBanner['button_url'] ?? ''));
+                    $firstButtonFinalUrl = $firstButtonUrl !== '' ? (preg_match('~^https?://~i', $firstButtonUrl) ? $firstButtonUrl : base_url(ltrim($firstButtonUrl, '/'))) : '';
+                    ?>
+                    <div class="spm-catalog-grid spm-catalog-dynamic-banner" data-catalog-copy>
+                        <div class="spm-catalog-copy">
+                            <div class="section-kicker">MATERI KATALOG</div>
+                            <h2 class="section-title" data-catalog-title><?= nl2br(e($firstTitle !== '' ? $firstTitle : 'Katalog FDR 2026')); ?></h2>
+                            <p class="section-description" data-catalog-subtitle style="margin-left:0;text-align:left;"><?= nl2br(e($firstSubtitle)); ?></p>
+                            <div class="spm-catalog-actions" data-catalog-action <?= $firstButtonText === '' || $firstButtonFinalUrl === '' ? 'hidden' : ''; ?>>
+                                <a class="btn btn-primary" data-catalog-button href="<?= e($firstButtonFinalUrl); ?>"><?= e($firstButtonText); ?> <i class="fa-solid fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="swiper spm-catalog-right-swiper" data-autoplay-delay="4500" data-autoplay-direction="forward">
+                            <div class="swiper-wrapper">
+                                <?php foreach ($catalogTopBanners as $bannerIndex => $catalogBanner): ?>
+                                    <?php
+                                    $catalogTitle = trim((string)($catalogBanner['title'] ?? ''));
+                                    $catalogSubtitle = trim((string)($catalogBanner['subtitle'] ?? ''));
+                                    $catalogButtonText = trim((string)($catalogBanner['button_text'] ?? ''));
+                                    $catalogButtonUrl = trim((string)($catalogBanner['button_url'] ?? ''));
+                                    $catalogImage = trim((string)($catalogBanner['image'] ?? ''));
+                                    $catalogVideo = trim((string)($catalogBanner['video'] ?? ''));
+                                    $catalogImageLink = trim((string)($catalogBanner['image_link'] ?? ''));
+                                    $catalogButtonFinalUrl = $catalogButtonUrl !== '' ? (preg_match('~^https?://~i', $catalogButtonUrl) ? $catalogButtonUrl : base_url(ltrim($catalogButtonUrl, '/'))) : '';
+                                    $catalogImageFinalUrl = $catalogImageLink !== '' ? (preg_match('~^https?://~i', $catalogImageLink) ? $catalogImageLink : base_url(ltrim($catalogImageLink, '/'))) : '';
+                                    ?>
+                                    <div class="swiper-slide"
+                                         data-catalog-title="<?= e($catalogTitle); ?>"
+                                         data-catalog-subtitle="<?= e($catalogSubtitle); ?>"
+                                         data-catalog-button="<?= e($catalogButtonText); ?>"
+                                         data-catalog-url="<?= e($catalogButtonFinalUrl); ?>">
+                                        <?php if ($catalogImage !== '' || $catalogVideo !== ''): ?>
+                                            <?php if ($catalogImageFinalUrl !== ''): ?><a class="spm-catalog-cover-link" href="<?= e($catalogImageFinalUrl); ?>" aria-label="<?= e($catalogTitle !== '' ? $catalogTitle : 'Buka banner katalog'); ?>"><?php else: ?><div class="spm-catalog-cover-link"><?php endif; ?>
+                                                <?php if ($catalogVideo !== ''): ?>
+                                                    <video class="spm-catalog-cover spm-catalog-cover-light" autoplay muted loop playsinline preload="<?= $bannerIndex === 0 ? 'auto' : 'metadata'; ?>"><source src="<?= e(media_url($catalogVideo)); ?>" type="video/mp4"></video>
+                                                <?php elseif ($catalogImage !== ''): ?>
+                                                    <img class="spm-catalog-cover spm-catalog-cover-light" src="<?= e(media_url($catalogImage)); ?>" alt="<?= e(trim((string)($catalogBanner['image_alt'] ?? '')) !== '' ? trim((string)$catalogBanner['image_alt']) : ($catalogTitle ?: 'Banner katalog')); ?>" loading="<?= $bannerIndex === 0 ? 'eager' : 'lazy'; ?>">
+                                                <?php endif; ?>
+                                            <?php if ($catalogImageFinalUrl !== ''): ?></a><?php else: ?></div><?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="swiper-button-prev" aria-label="Banner sebelumnya"></div>
+                            <div class="swiper-button-next" aria-label="Banner berikutnya"></div>
+                            <div class="swiper-pagination"></div>
                         </div>
                     </div>
-                    <a class="spm-catalog-cover-link" href="<?= e(base_url('uploads/general/katalog-fdr-2026.pdf')); ?>" aria-label="Buka PDF katalog FDR 2026">
-                        <img class="spm-catalog-cover spm-catalog-cover-light" src="<?= e(media_url('uploads/general/katalog-fdr-2026-preview.webp')); ?>" alt="Pratinjau katalog ban FDR 2026" loading="lazy">
-                    </a>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
     <!--
     |--------------------------------------------------------------------------
