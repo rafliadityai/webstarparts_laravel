@@ -1213,11 +1213,11 @@ $navEscape = static function (
             <a
                 href="http://bengkelku.online/"
                 class="navbar-partner-button"
-                aria-label="Ingin Menjadi Mitra Dengan Kami?"
-                title="Ingin Menjadi Mitra Dengan Kami?"
+                aria-label="Bergabung Menjadi Mitra"
+                title="Bergabung Menjadi Mitra"
             >
                 <i class="fa-solid fa-handshake-angle" aria-hidden="true"></i>
-                <span>Ingin Menjadi Mitra Dengan Kami?</span>
+                <span>Bergabung Menjadi Mitra</span>
             </a>
 
 
@@ -1724,7 +1724,7 @@ $navEscape = static function (
                     class="btn btn-outline mobile-partner-cta"
                 >
                     <i class="fa-solid fa-handshake-angle" aria-hidden="true"></i>
-                    Ingin Menjadi Mitra Dengan Kami?
+                    Bergabung Menjadi Mitra
                     <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 </a>
 

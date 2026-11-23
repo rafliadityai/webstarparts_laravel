@@ -16,12 +16,19 @@ $admin = current_admin() ?? [];
 $error = '';
 $success = '';
 $editId = get_int('edit', 0);
+if ($editId <= 0 && is_post()) {
+    $editId = (int) ($_POST['id'] ?? 0);
+}
 $editUser = null;
+$submittedUser = null;
 
 if ($editId > 0) {
     $stmt = $pdo->prepare('SELECT id, username, full_name, email, role, status, last_login, password_changed_at FROM admin_users WHERE id = ? LIMIT 1');
     $stmt->execute([$editId]);
     $editUser = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    if ($editId > 0 && !$editUser) {
+        $error = 'Akun admin yang akan diedit tidak ditemukan.';
+    }
 }
 
 if (is_post()) {
@@ -30,6 +37,14 @@ if (is_post()) {
     } else {
         $action = post_string('action');
         $id = (int) ($_POST['id'] ?? 0);
+        $submittedUser = [
+            'id' => $id,
+            'username' => trim(post_string('username')),
+            'full_name' => trim(post_string('full_name')),
+            'email' => trim(post_string('email')),
+            'role' => strtolower(post_string('role')),
+            'status' => isset($_POST['status']) ? 1 : 0,
+        ];
 
         try {
             if ($action === 'save_user') {
@@ -102,7 +117,7 @@ if (get_string('saved', '') === '1') {
 
 $users = $pdo->query('SELECT id, username, full_name, email, role, status, last_login, password_changed_at, created_at FROM admin_users ORDER BY id ASC')->fetchAll(PDO::FETCH_ASSOC);
 
-$formUser = $editUser ?: [
+$formUser = $submittedUser ?: $editUser ?: [
     'id' => 0,
     'username' => '',
     'full_name' => '',
@@ -112,6 +127,7 @@ $formUser = $editUser ?: [
     'last_login' => null,
     'password_changed_at' => null
 ];
+$formIsEditing = $editUser !== null || ($submittedUser !== null && (int) $submittedUser['id'] > 0);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -121,24 +137,28 @@ $formUser = $editUser ?: [
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 :root{--bg:#f5f7fb;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;--primary:#111827;--danger:#b91c1c}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,Arial,sans-serif;color:var(--text)}.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 48px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px}.title h1{margin:0 0 5px;font-size:28px}.title p{margin:0;color:var(--muted)}.nav{display:flex;flex-wrap:wrap;gap:8px}.nav a,.btn{padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);text-decoration:none;font-size:13px}.grid{display:grid;grid-template-columns:360px 1fr;gap:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 24px rgba(15,23,42,.04)}.panel-head{padding:18px 20px;border-bottom:1px solid var(--line)}.panel-head h2{margin:0;font-size:18px}.panel-body{padding:20px}.field{margin-bottom:13px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;padding:11px 12px;border:1px solid #d1d5db;border-radius:10px;font:inherit;background:#fff}.check{display:flex;gap:8px;align-items:center;font-size:13px;margin-bottom:15px}.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);cursor:pointer}.btn-secondary{background:#f3f4f6}.alert{padding:13px 15px;border-radius:10px;margin-bottom:16px;font-size:13px}.success{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}.danger{background:#fef2f2;color:var(--danger);border:1px solid #fecaca}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:11px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.table th{background:#f8fafc;color:var(--muted);font-size:11px;text-transform:uppercase}.badge{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:700}.active{background:#dcfce7;color:#166534}.inactive{background:#f3f4f6;color:#6b7280}.role{background:#eef2ff;color:#3730a3}.muted{color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+.nav a,.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);text-decoration:none;font-size:13px}.grid{display:grid;grid-template-columns:360px 1fr;gap:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 24px rgba(15,23,42,.04);scroll-margin-top:24px}.panel-head{padding:18px 20px;border-bottom:1px solid var(--line)}.panel-head h2{margin:0;font-size:18px}.panel-body{padding:20px}.field{margin-bottom:13px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;padding:11px 12px;border:1px solid #d1d5db;border-radius:10px;font:inherit;background:#fff}.check{display:flex;gap:8px;align-items:center;font-size:13px;margin-bottom:15px}.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);cursor:pointer}.btn-secondary{background:#f3f4f6}.btn-secondary:hover,.nav a:hover{border-color:#9ca3af}.alert{padding:13px 15px;border-radius:10px;margin-bottom:16px;font-size:13px}.success{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}.danger{background:#fef2f2;color:var(--danger);border:1px solid #fecaca}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:11px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.table th{background:#f8fafc;color:var(--muted);font-size:11px;text-transform:uppercase}.badge{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:700}.active{background:#dcfce7;color:#166534}.inactive{background:#f3f4f6;color:#6b7280}.role{background:#eef2ff;color:#3730a3}.muted{color:var(--muted)}@media(max-width:900px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.wrap{padding:18px 12px}.table{min-width:720px}}
 </style>
 </head>
-<body><div class="wrap">
+<body>
+<?php render_admin_sidebar_assets(); ?>
+<?php render_admin_sidebar('users.php'); ?>
+<div class="wrap spm-shift">
 <div class="top"><div class="title"><h1><i class="fa-solid fa-users-gear"></i> Admin Users</h1><p>Kelola akun administrator. Hanya superadmin yang dapat mengakses halaman ini.</p></div><div class="nav"><a href="<?= e(base_url('admin/dashboard.php')); ?>"><i class="fa-solid fa-gauge-high"></i> Dashboard</a><a href="<?= e(base_url('admin/security.php')); ?>"><i class="fa-solid fa-shield-halved"></i> Security</a><a href="<?= e(base_url('admin/logout.php')); ?>"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></div></div>
 <?php if ($success): ?><div class="alert success"><i class="fa-solid fa-circle-check"></i> <?= e($success); ?></div><?php endif; ?>
 <?php if ($error): ?><div class="alert danger"><i class="fa-solid fa-triangle-exclamation"></i> <?= e($error); ?></div><?php endif; ?>
 <div class="grid">
-<section class="panel"><div class="panel-head"><h2><?= $editUser ? 'Edit Admin' : 'Tambah Admin'; ?></h2></div><div class="panel-body"><form method="post" autocomplete="off"><?= csrf_input(); ?><input type="hidden" name="action" value="save_user"><input type="hidden" name="id" value="<?= (int) $formUser['id']; ?>">
+<section class="panel" id="user-form"><div class="panel-head"><h2><?= $formIsEditing ? 'Edit Admin' : 'Tambah Admin'; ?></h2></div><div class="panel-body"><form method="post" autocomplete="off"><?= csrf_input(); ?><input type="hidden" name="action" value="save_user"><input type="hidden" name="id" value="<?= (int) $formUser['id']; ?>">
 <div class="field"><label>Username</label><input name="username" value="<?= e((string)$formUser['username']); ?>" maxlength="100" required pattern="[A-Za-z0-9._-]{3,100}"></div>
 <div class="field"><label>Nama Lengkap</label><input name="full_name" value="<?= e((string)$formUser['full_name']); ?>" maxlength="150" required></div>
 <div class="field"><label>Email</label><input type="email" name="email" value="<?= e((string)($formUser['email'] ?? '')); ?>" maxlength="150"></div>
 <div class="field"><label>Role</label><select name="role"><option value="superadmin" <?= ($formUser['role'] ?? '') === 'superadmin' ? 'selected' : ''; ?>>Superadmin</option><option value="admin" <?= ($formUser['role'] ?? '') === 'admin' ? 'selected' : ''; ?>>Admin</option><option value="editor" <?= ($formUser['role'] ?? '') === 'editor' ? 'selected' : ''; ?>>Editor</option></select></div>
-<div class="field"><label>Password <?= $editUser ? '(opsional, isi untuk reset)' : ''; ?></label><input type="password" name="password" <?= $editUser ? '' : 'required'; ?> minlength="10" autocomplete="new-password"></div>
+<div class="field"><label>Password <?= $formIsEditing ? '(opsional, isi untuk reset)' : ''; ?></label><input type="password" name="password" <?= $formIsEditing ? '' : 'required'; ?> minlength="10" autocomplete="new-password"></div>
 <label class="check"><input type="checkbox" name="status" value="1" <?= (int)($formUser['status'] ?? 1) === 1 ? 'checked' : ''; ?>> Akun aktif</label>
 <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
-<?php if ($editUser): ?><a class="btn" href="<?= e(base_url('admin/users.php')); ?>">Batal</a><?php endif; ?>
+<?php if ($formIsEditing): ?><a class="btn" href="<?= e(base_url('admin/users.php')); ?>">Batal</a><?php endif; ?>
 </form></div></section>
 <section class="panel"><div class="panel-head"><h2>Daftar Admin</h2></div><div class="panel-body"><div class="table-wrap"><table class="table"><thead><tr><th>ID</th><th>Username</th><th>Nama</th><th>Role</th><th>Status</th><th>Last Login</th><th>Action</th></tr></thead><tbody>
-<?php foreach($users as $user): ?><tr><td><?= (int)$user['id']; ?></td><td><strong><?= e((string)$user['username']); ?></strong><br><span class="muted"><?= e((string)($user['email'] ?? '-')); ?></span></td><td><?= e((string)$user['full_name']); ?></td><td><span class="badge role"><?= e((string)$user['role']); ?></span></td><td><span class="badge <?= (int)$user['status'] === 1 ? 'active' : 'inactive'; ?>"><?= (int)$user['status'] === 1 ? 'Aktif' : 'Nonaktif'; ?></span></td><td><?= e((string)($user['last_login'] ?: '-')); ?></td><td><a class="btn btn-secondary" href="<?= e(base_url('admin/users.php?edit='.(int)$user['id'])); ?>"><i class="fa-solid fa-pen"></i> Edit</a></td></tr><?php endforeach; ?>
+<?php foreach($users as $user): ?><tr><td><?= (int)$user['id']; ?></td><td><strong><?= e((string)$user['username']); ?></strong><br><span class="muted"><?= e((string)($user['email'] ?? '-')); ?></span></td><td><?= e((string)$user['full_name']); ?></td><td><span class="badge role"><?= e((string)$user['role']); ?></span></td><td><span class="badge <?= (int)$user['status'] === 1 ? 'active' : 'inactive'; ?>"><?= (int)$user['status'] === 1 ? 'Aktif' : 'Nonaktif'; ?></span></td><td><?= e((string)($user['last_login'] ?: '-')); ?></td><td><a class="btn btn-secondary" href="<?= e(base_url('admin/users.php?edit='.(int)$user['id'].'#user-form')); ?>" title="Edit <?= e((string)$user['full_name']); ?>"><i class="fa-solid fa-pen"></i> Edit</a></td></tr><?php endforeach; ?>
 </tbody></table></div></div></section>
 </div></div></body></html>

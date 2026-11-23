@@ -850,12 +850,12 @@ require_once __DIR__ . '/includes/navbar.php';
                     </h2>
 
 
-                    <p
+                    <!-- <p
                         class="section-description"
                     >
                         Menjadi partner distribusi yang
                         dapat memberikan nilai jangka panjang.
-                    </p>
+                    </p> -->
 
                 </div>
 
