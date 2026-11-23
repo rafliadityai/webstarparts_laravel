@@ -785,8 +785,8 @@ require_once __DIR__ . '/includes/navbar.php';
                                         $bannerFinalUrl = '';
                                         $bannerIsExternal = false;
                                         if ($bannerButtonUrl !== '') {
-                                            $bannerIsExternal = (bool) preg_match('~^https?://~i', $bannerButtonUrl);
-                                            $bannerFinalUrl = $bannerIsExternal ? $bannerButtonUrl : base_url(ltrim($bannerButtonUrl, '/'));
+$bannerIsExternal = (bool) preg_match('~^https?://~i', (string) $bannerButtonUrl);
+                                            $bannerFinalUrl = $bannerIsExternal ? $bannerButtonUrl : base_url(ltrim((string) $bannerButtonUrl, '/'));
                                         } elseif ($bannerButtonText !== '') {
                                             $bannerFinalUrl = base_url('products.php');
                                         }
@@ -881,8 +881,8 @@ require_once __DIR__ . '/includes/navbar.php';
                 $bannerFinalUrl = '';
                 $bannerIsExternal = false;
                 if ($bannerButtonUrl !== '') {
-                    $bannerIsExternal = (bool) preg_match('~^https?://~i', $bannerButtonUrl);
-                    $bannerFinalUrl = $bannerIsExternal ? $bannerButtonUrl : base_url(ltrim($bannerButtonUrl, '/'));
+                    $bannerIsExternal = (bool) preg_match('~^https?://~i', (string) $bannerButtonUrl);
+                    $bannerFinalUrl = $bannerIsExternal ? $bannerButtonUrl : base_url(ltrim((string) $bannerButtonUrl, '/'));
                 } elseif ($bannerButtonText !== '') {
                     $bannerFinalUrl = base_url('products.php');
                 }
